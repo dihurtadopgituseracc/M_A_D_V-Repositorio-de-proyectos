@@ -1,0 +1,10 @@
+{
+  "description": "Showcases active video game development projects, allowing users to view details and collaborate seamlessly on their favorite initiatives.",
+  "robots": {
+    "index": false
+  },
+  "accessibility": {
+    "addBypassLinks": false,
+    "ignoreReducedMotion": false
+  }
+}

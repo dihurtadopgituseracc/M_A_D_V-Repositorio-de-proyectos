@@ -1,0 +1,100 @@
+@import "tailwindcss";
+
+@font-face {
+  font-family: "Instrument Sans:Bold";
+  src: url("https://static.figma.com/font/InstrumentSans_wdth_wght__1")
+    format("woff2");
+  font-style: normal;
+  font-weight: 700;
+}
+
+@font-face {
+  font-family: "Inter:Regular";
+  src: url("https://static.figma.com/font/Inter_1") format("woff2");
+  font-style: normal;
+  font-weight: 400;
+}
+
+@font-face {
+  font-family: "Inter:Semi Bold";
+  src: url("https://static.figma.com/font/Inter_1") format("woff2");
+  font-style: normal;
+  font-weight: 600;
+}
+
+:root {
+  color: #171827;
+  background: #f6f3ea;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  background: #f6f3ea;
+}
+
+body {
+  min-width: 320px;
+  min-height: 100dvh;
+  margin: 0;
+  background: #f6f3ea;
+}
+
+button {
+  cursor: pointer;
+}
+
+::selection {
+  color: white;
+  background: #287b86;
+}
+
+.project-art {
+  isolation: isolate;
+}
+
+.project-art::after {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  content: "";
+  background-image:
+    linear-gradient(rgb(255 255 255 / 0.055) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(255 255 255 / 0.055) 1px, transparent 1px);
+  background-size: 26px 26px;
+  mask-image: linear-gradient(to bottom right, black, transparent 75%);
+}
+
+.project-art__orb {
+  position: absolute;
+  border: 1px solid rgb(255 255 255 / 0.14);
+  border-radius: 999px;
+}
+
+.project-art__orb--one {
+  top: -45%;
+  right: -6%;
+  width: 72%;
+  aspect-ratio: 1;
+}
+
+.project-art__orb--two {
+  bottom: -62%;
+  left: -8%;
+  width: 82%;
+  aspect-ratio: 1;
+  background: rgb(255 255 255 / 0.035);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+}
