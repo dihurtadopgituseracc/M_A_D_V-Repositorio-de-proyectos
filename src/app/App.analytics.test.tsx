@@ -98,6 +98,18 @@ describe("analytics interface instrumentation", () => {
     expect(
       container.querySelectorAll('button[aria-label^="Abrir imagen"]'),
     ).toHaveLength(6)
+    expect(
+      Array.from(container.querySelectorAll("img")).map((image) =>
+        image.getAttribute("src"),
+      ),
+    ).toEqual([
+      "/assets/Titulo.svg",
+      "/assets/Contexto1.svg",
+      "/assets/Objetivos.svg",
+      "/assets/Problemas.svg",
+      "/assets/Roadmap.svg",
+      "/assets/Usuario.svg",
+    ])
     await click(container.querySelector('button[aria-label="Abrir imagen 01"]'))
     expect(container.querySelector('[role="dialog"]')).not.toBeNull()
     expect(

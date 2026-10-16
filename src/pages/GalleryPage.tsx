@@ -2,17 +2,38 @@ import { useEffect, useState } from "react"
 
 import { reg, semi } from "@/constants/styles"
 
-const galleryItems = Array.from({ length: 6 }, (_, index) => {
-  const number = String(index + 1).padStart(2, "0")
-
-  return {
-    number,
-
-    src: `/assets/images/gallery/${number}.webp`,
-
-    alt: `Imagen ${number} del proyecto MADV`,
-  }
-})
+const galleryItems = [
+  {
+    number: "01",
+    src: "/assets/Titulo.svg",
+    alt: "Título y portada de MADV",
+  },
+  {
+    number: "02",
+    src: "/assets/Contexto1.svg",
+    alt: "Contexto del proyecto MADV",
+  },
+  {
+    number: "03",
+    src: "/assets/Objetivos.svg",
+    alt: "Objetivos del proyecto MADV",
+  },
+  {
+    number: "04",
+    src: "/assets/Problemas.svg",
+    alt: "Problemas que aborda MADV",
+  },
+  {
+    number: "05",
+    src: "/assets/Roadmap.svg",
+    alt: "Roadmap del proyecto MADV",
+  },
+  {
+    number: "06",
+    src: "/assets/Usuario.svg",
+    alt: "Perfil de usuario de MADV",
+  },
+]
 
 function GalleryImage({
   item,
@@ -29,15 +50,18 @@ function GalleryImage({
         expanded ? "aspect-video" : "aspect-[16/10]"
       }`}
     >
-      <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 text-center text-white/70">
+      <div
+        aria-hidden="true"
+        className="absolute inset-0 flex flex-col items-center justify-center gap-2 text-center text-white/70"
+      >
         <span className={`${semi} text-[28px] text-[#f0cb82]`}>
           {item.number}
         </span>
         <span className={`${reg} text-[11px]`}>
-          Añade el archivo {item.number}.webp
+          No se pudo cargar {item.src.split("/").at(-1)}
         </span>
         <span className={`${reg} text-[10px] text-white/45`}>
-          public/assets/images/gallery/
+          public/assets/
         </span>
       </div>
       <img

@@ -31,8 +31,13 @@ Aplicación web para explorar proyectos de videojuegos, revisar su avance y sus 
 │   └── assets/
 │       ├── images/               # Imágenes compartidas; URL pública /assets/images/
 │       │   ├── LogoMADV.svg      # Logo de la landing
-│       │   └── gallery/          # Seis imágenes horizontales de la galería
-│       └── *.svg                 # SVG existentes; 15352.svg se usa en Progress
+│       ├── Titulo.svg            # Lámina de título para la galería
+│       ├── Contexto1.svg         # Lámina de contexto
+│       ├── Objetivos.svg         # Lámina de objetivos
+│       ├── Problemas.svg         # Lámina de problemas
+│       ├── Roadmap.svg           # Lámina de roadmap
+│       ├── Usuario.svg           # Lámina de usuario
+│       └── otros SVG             # Recursos; 15352.svg se usa en Progress
 └── src/
     ├── main.tsx                  # Montaje de React e importación de CSS
     ├── App.tsx                   # Fachada hacia app/App.tsx
@@ -81,9 +86,9 @@ Aplicación web para explorar proyectos de videojuegos, revisar su avance y sus 
 
 - `RepositoryPage` recorre `projects` y presenta una tarjeta por proyecto.
 - La raíz (`/`) muestra `LandingPage`. El CTA “Repositorio abierto” navega a `?vista=repository`; “Saber más del proyecto” abre `?vista=gallery`.
-- `GalleryPage` presenta seis espacios para imágenes horizontales en `public/assets/images/gallery/01.webp` a `06.webp`. Al pulsar una se abre un visor 16:9 a pantalla completa con navegación, cierre y soporte de teclado; cuando falta el archivo, muestra un placeholder con la ruta que debe añadirse.
+- `GalleryPage` presenta las seis láminas SVG `Titulo.svg`, `Contexto1.svg`, `Objetivos.svg`, `Problemas.svg`, `Roadmap.svg` y `Usuario.svg` desde `/assets/`. Al pulsar una se abre un visor 16:9 a pantalla completa con navegación, cierre y soporte de teclado; si un SVG no carga, se muestra su nombre como fallback.
 - La landing presenta cantidades calculadas del catálogo local y una lista breve de los proyectos existentes. No añade proyectos ni modifica el catálogo.
-- Los recursos visuales compartidos van en `public/assets/images/` y se referencian desde la web con `/assets/images/<archivo>`. El logo de MADV se encuentra en `public/assets/images/LogoMADV.svg` y se usa en el encabezado de la landing. La galería espera `public/assets/images/gallery/01.webp` a `06.webp`; aún no hay imágenes de galería cargadas.
+- Los recursos visuales compartidos van en `public/assets/` y se referencian desde la web con `/assets/<archivo>`. El logo de MADV se encuentra en `public/assets/images/LogoMADV.svg` y se usa en el encabezado de la landing. Las seis láminas SVG de la galería ya se encuentran en la raíz de assets.
 - `repository_view` se registra al entrar al listado, no al visitar la landing. `trackCurrentPageView` distingue el listado mediante `vista=repository`.
 - Al seleccionar un proyecto, `app/App.tsx` actualiza el estado y agrega su ID a la query string: `?proyecto=<id>`.
 - `proyecto=<id>` tiene prioridad sobre `vista`; por ello los enlaces directos y QR existentes continúan abriendo la ficha del proyecto.
