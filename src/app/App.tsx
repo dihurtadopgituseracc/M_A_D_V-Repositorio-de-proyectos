@@ -88,6 +88,14 @@ export default function App() {
     scrollToTop()
   }
 
+  const closeRepository = () => {
+    const url = new URL(window.location.href)
+    url.searchParams.delete("vista")
+    window.history.pushState({}, "", `${url.pathname}${url.search}`)
+    setRepositoryOpen(false)
+    scrollToTop()
+  }
+
   const navigate = (project: Project | null) => {
     if (!project) {
       openRepository()
@@ -138,7 +146,9 @@ export default function App() {
     )
   }
 
-  if (repositoryOpen) return <RepositoryPage onOpen={navigate} />
+  if (repositoryOpen) {
+    return <RepositoryPage onOpen={navigate} onBack={closeRepository} />
+  }
 
   if (galleryOpen) return <GalleryPage onBack={closeGallery} />
 

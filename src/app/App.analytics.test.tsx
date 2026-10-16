@@ -140,6 +140,25 @@ describe("analytics interface instrumentation", () => {
     expect(localAnalyticsAdapter.getEvents()).toHaveLength(1)
   })
 
+  it("returns to the landing from the repository", async () => {
+    await renderApp("/?vista=repository")
+
+    expect(container.querySelector("h1")?.textContent).toBe(
+      "Proyectos que buscan nuevas manos",
+    )
+
+    await click(
+      Array.from(container.querySelectorAll("button")).find((button) =>
+        button.textContent?.includes("Volver a MADV"),
+      ) ?? null,
+    )
+
+    expect(window.location.search).toBe("")
+    expect(container.querySelector("h1")?.textContent).toContain(
+      "Un repositorio abierto",
+    )
+  })
+
   it("tracks Stewart without inventing needs and tracks confirmed need interactions", async () => {
     await renderApp()
 

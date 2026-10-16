@@ -6,11 +6,11 @@ export const projects: Project[] = [
     title: "Stewart",
     shortTitle: "Stewart",
     genre: "ARPG de aventura, fantasía ligera y comedia",
-    team: null,
-    progress: null,
-    stage: "Por confirmar",
+    team: 2,
+    progress: 15,
+    stage: "Preproducción",
     status:
-      "El GDD registra seis personas desarrolladoras y cuatro contribuyentes retirados; el equipo activo está por confirmar. El documento sigue en evolución y la investigación de mercado figura como pendiente.",
+      "El GDD registra seis personas desarrolladoras; el equipo activo lo conforman dos personas. ",
     eyebrow: "Fantasía inspirada en Colombia",
     summary:
       "Acompaña a Stewart y Zarah por siete reinos inspirados en regiones de Colombia y en las épocas independentista y republicana. Explora desde una vista top-down y combate en escenarios laterales. La empatía permite intentar resolver los conflictos con acciones pacíficas como hablar o halagar.",

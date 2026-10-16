@@ -85,7 +85,7 @@ Aplicación web para explorar proyectos de videojuegos, revisar su avance y sus 
 
 ## Navegación y vistas
 
-- `RepositoryPage` recorre `projects` y presenta una tarjeta por proyecto.
+- `RepositoryPage` recorre `projects` y presenta una tarjeta por proyecto; el botón “Volver a MADV” regresa a la portada y elimina `vista=repository` de la URL.
 - La raíz (`/`) muestra `LandingPage`. El CTA “Repositorio abierto” navega a `?vista=repository`; “Saber más del proyecto” abre `?vista=gallery`.
 - `GalleryPage` presenta las seis láminas SVG `Titulo.svg`, `Contexto1.svg`, `Objetivos.svg`, `Problemas.svg`, `Roadmap.svg` y `Usuario.svg` desde `/assets/`, en una columna móvil, dos columnas en tablet y tres en escritorio. Al pulsar una se abre un visor 16:9 a pantalla completa con navegación, cierre y soporte de teclado; si un SVG no carga, se muestra su nombre como fallback.
 - La landing presenta cantidades calculadas del catálogo local y una lista breve de los proyectos existentes. No añade proyectos ni modifica el catálogo.
