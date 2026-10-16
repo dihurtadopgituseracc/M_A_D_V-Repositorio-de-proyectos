@@ -145,7 +145,9 @@ export default function LandingPage({
                   </p>
                 </div>
                 <p className={`${semi} text-[11px] text-[#287b86]`}>
-                  {project.stage} · {project.progress}%
+                  {project.progress === null
+                    ? project.stage
+                    : `${project.stage} · ${project.progress}%`}
                 </p>
               </article>
             ))}

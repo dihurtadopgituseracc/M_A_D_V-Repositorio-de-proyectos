@@ -3,120 +3,28 @@ import type { Project } from "@/types/project"
 export const projects: Project[] = [
   {
     id: "ecos-de-umbra",
-    title: "Ecos de Umbra",
-    shortTitle: "Ecos de Umbra",
-    genre: "RPG narrativo",
-    team: 4,
-    progress: 62,
-    stage: "Producción",
-    status: "Prototipo jugable + arte en integración",
-    eyebrow: "Aventura narrativa cooperativa",
+    title: "Stewart",
+    shortTitle: "Stewart",
+    genre: "ARPG de aventura, fantasía ligera y comedia",
+    team: null,
+    progress: null,
+    stage: "Por confirmar",
+    status:
+      "El GDD registra seis personas desarrolladoras y cuatro contribuyentes retirados; el equipo activo está por confirmar. El documento sigue en evolución y la investigación de mercado figura como pendiente.",
+    eyebrow: "Fantasía inspirada en Colombia",
     summary:
-      "Una expedición atraviesa un archipiélago cubierto por una niebla que conserva los recuerdos de sus habitantes. Cada decisión altera las relaciones del grupo, abre nuevas rutas y transforma el desenlace. El prototipo ya incluye exploración, diálogos ramificados y el primer encuentro cooperativo.",
+      "Acompaña a Stewart y Zarah por siete reinos inspirados en regiones de Colombia y en las épocas independentista y republicana. Explora desde una vista top-down y combate en escenarios laterales. La empatía permite intentar resolver los conflictos con acciones pacíficas como hablar o halagar.",
     tools: [
-      { area: "Programación", detail: "C# · Unity · Ink" },
-      { area: "Arte", detail: "Aseprite · Photoshop" },
-      { area: "Sonido", detail: "Audacity · FMOD" },
+      { area: "Motor", detail: "Godot · GDScript" },
+      { area: "Arte", detail: "Aseprite · Krita" },
+      { area: "Audio", detail: "FL Studio" },
     ],
-    tags: ["Acción", "RPG", "Cooperativo"],
-    needs: [
-      {
-        id: "ecos-audio",
-        name: "Audio",
-        detail: "Diseño de SFX para el prototipo",
-        commitment: "2 sesiones",
-        tool: { area: "Audio", detail: "FMOD · Audacity" },
-        description:
-          "Buscamos definir la identidad sonora del primer recorrido por Umbra. La colaboración contempla efectos ambientales, señales de interacción y una primera mezcla para el encuentro cooperativo.",
-        requirements: [
-          "Experiencia creando SFX para videojuegos",
-          "Capacidad para entregar stems organizados",
-          "Disponibilidad para dos sesiones de revisión",
-        ],
-        deliverable: {
-          name: "Paquete de audio",
-          detail: "12 SFX editables · WAV 48 kHz",
-        },
-        featured: true,
-      },
-      {
-        id: "ecos-arte-2d",
-        name: "Arte 2D",
-        detail: "Cuatro assets para la interfaz",
-        commitment: "2–3 sesiones",
-        tool: { area: "Ilustración 2D", detail: "Aseprite · Photoshop" },
-        description:
-          "Necesitamos completar el lenguaje visual del inventario con cuatro piezas que mantengan la estética orgánica y brumosa del proyecto.",
-        requirements: [
-          "Dominio de ilustración digital o pixel art",
-          "Trabajo por capas y archivo fuente editable",
-          "Adaptación a una guía visual existente",
-        ],
-        deliverable: {
-          name: "Assets de interfaz",
-          detail: "4 piezas · PNG y archivo fuente",
-        },
-        featured: true,
-      },
-      {
-        id: "ecos-programacion-inventario",
-        name: "Programación",
-        detail: "Integración del inventario",
-        commitment: "PUNTUAL",
-        tool: { area: "Programación", detail: "C# · Unity" },
-        description:
-          "La interfaz visual del inventario ya está diseñada. Hace falta conectar el sistema de datos, los estados de selección y la persistencia entre escenas.",
-        requirements: [
-          "Experiencia con UI Toolkit o Canvas de Unity",
-          "Manejo de ScriptableObjects",
-          "Código documentado y desacoplado",
-        ],
-        deliverable: {
-          name: "Módulo funcional",
-          detail: "Scripts C# · escena de demostración",
-        },
-      },
-      {
-        id: "ecos-narrativa-dialogos",
-        name: "Narrativa",
-        detail: "Revisión de diálogos del capítulo uno",
-        commitment: "PUNTUAL",
-        tool: { area: "Narrativa", detail: "Ink · Google Docs" },
-        description:
-          "Queremos revisar ritmo, claridad y consistencia de voz en las conversaciones del primer capítulo antes de la siguiente ronda de pruebas.",
-        requirements: [
-          "Experiencia en narrativa interactiva",
-          "Criterio de edición y continuidad",
-          "Conocimiento básico de estructuras ramificadas",
-        ],
-        deliverable: {
-          name: "Documento comentado",
-          detail: "Guion revisado · informe breve",
-        },
-      },
-    ],
-    contacts: [
-      {
-        type: "whatsapp",
-        label: "WhatsApp",
-        handle: "Equipo Umbra",
-        href: "https://wa.me/?text=Hola%2C%20quiero%20colaborar%20con%20Ecos%20de%20Umbra",
-      },
-      {
-        type: "instagram",
-        label: "Instagram",
-        handle: "@ecosdeumbra.game",
-        href: "https://instagram.com/ecosdeumbra.game",
-      },
-      {
-        type: "discord",
-        label: "Discord",
-        handle: "Ecos de Umbra",
-        href: "https://discord.com/",
-      },
-    ],
-    accent: "#287b86",
-    artLabel: "MUNDO NARRATIVO / ARTE CONCEPTUAL",
+    tags: ["Pixel art", "Exploración", "Combate", "Narrativa", "Fantasía"],
+    needs: [],
+    contacts: [],
+    accent: "#dca039",
+    artLabel: "STEWART · ARTE CONCEPTUAL",
+    artImage: "/assets/images/gallery/StewartCard.png",
   },
   {
     id: "frecuencia-cero",

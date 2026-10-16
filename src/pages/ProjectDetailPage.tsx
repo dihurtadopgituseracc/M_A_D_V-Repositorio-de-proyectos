@@ -105,17 +105,26 @@ export default function ProjectDetailPage({
             <div className="mt-6 border-t border-[#171827]/10 pt-5">
               <div className="flex items-end justify-between gap-3">
                 <p className={`${reg} text-[12px] text-[#6b6a73]`}>
-                  {project.genre} · {project.team} integrantes
+                  {project.genre} ·{" "}
+                  {project.team === null
+                    ? "Equipo por confirmar"
+                    : `${project.team} integrantes`}
                 </p>
                 <p className={`${semi} text-[22px] text-[#171827]`}>
-                  {project.progress}%
+                  {project.progress === null
+                    ? "Por confirmar"
+                    : `${project.progress}%`}
                 </p>
               </div>
-              <div className="mt-3">
-                <Progress value={project.progress} />
-              </div>
+              {project.progress !== null && (
+                <div className="mt-3">
+                  <Progress value={project.progress} />
+                </div>
+              )}
               <p className={`${reg} mt-2 text-[11px] text-[#6b6a73]`}>
-                Avance general del proyecto
+                {project.progress === null
+                  ? "Avance general por confirmar con el equipo"
+                  : "Avance general del proyecto"}
               </p>
             </div>
 
@@ -171,53 +180,72 @@ export default function ProjectDetailPage({
             <h2 className={`${semi} mt-2 text-[22px] text-[#171827]`}>
               ¿Qué necesita el proyecto?
             </h2>
-            <div className="mt-4 grid gap-3 xl:grid-cols-2">
-              {project.needs.map((need, index) => (
-                <NeedCard
-                  key={`${need.name}-${need.detail}`}
-                  need={need}
-                  index={index}
-                  onOpen={() => {
-                    trackNeedView(project.id, need.id)
-                    onOpenNeed(need, index)
-                  }}
-                />
-              ))}
-            </div>
+            {project.needs.length > 0 ? (
+              <div className="mt-4 grid gap-3 xl:grid-cols-2">
+                {project.needs.map((need, index) => (
+                  <NeedCard
+                    key={`${need.name}-${need.detail}`}
+                    need={need}
+                    index={index}
+                    onOpen={() => {
+                      trackNeedView(project.id, need.id)
+                      onOpenNeed(need, index)
+                    }}
+                  />
+                ))}
+              </div>
+            ) : (
+              <p className={`${reg} mt-3 text-[13px] text-[#6b6a73]`}>
+                Las tareas abiertas y el tipo de apoyo están por confirmar con
+                el equipo.
+              </p>
+            )}
           </div>
         </section>
 
-        <section
-          className="mt-10 flex flex-col justify-between gap-5 rounded-[22px] bg-[#171827] px-6 py-6 sm:flex-row sm:items-center sm:px-8"
-          aria-live="polite"
-        >
-          <div>
+        {project.needs.length > 0 ? (
+          <section
+            className="mt-10 flex flex-col justify-between gap-5 rounded-[22px] bg-[#171827] px-6 py-6 sm:flex-row sm:items-center sm:px-8"
+            aria-live="polite"
+          >
+            <div>
+              <p className={`${semi} text-[18px] text-white`}>
+                {interestSent
+                  ? "Tu interés quedó registrado"
+                  : "¿Tu perfil encaja con el proyecto?"}
+              </p>
+              <p className={`${reg} mt-1 text-[12px] text-[#e9e7df]`}>
+                {interestSent
+                  ? `El equipo de ${project.title} ya puede revisar tu solicitud.`
+                  : "Comparte tu interés y el equipo podrá ponerse en contacto."}
+              </p>
+            </div>
+            <button
+              onClick={() => {
+                trackCollaborateClick(project.id, "project_interest")
+                setInterestSent(true)
+              }}
+              disabled={interestSent}
+              className={`${semi} min-h-11 rounded-[9px] px-5 text-[12px] transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white ${
+                interestSent
+                  ? "cursor-default bg-white/15 text-white"
+                  : "bg-[#d9533f] text-[#171827] hover:bg-[#e5634d] active:scale-95"
+              }`}
+            >
+              {interestSent ? "INTERÉS REGISTRADO" : "MOSTRAR INTERÉS"}
+            </button>
+          </section>
+        ) : (
+          <section className="mt-10 rounded-[22px] bg-[#171827] px-6 py-6 sm:px-8">
             <p className={`${semi} text-[18px] text-white`}>
-              {interestSent
-                ? "Tu interés quedó registrado"
-                : "¿Tu perfil encaja con el proyecto?"}
+              Oportunidad de colaboración por confirmar
             </p>
             <p className={`${reg} mt-1 text-[12px] text-[#e9e7df]`}>
-              {interestSent
-                ? `El equipo de ${project.title} ya puede revisar tu solicitud.`
-                : "Comparte tu interés y el equipo podrá ponerse en contacto."}
+              El GDD menciona recibir retroalimentación, pero el equipo aún debe
+              confirmar las tareas abiertas y el tipo de ayuda que necesita.
             </p>
-          </div>
-          <button
-            onClick={() => {
-              trackCollaborateClick(project.id, "project_interest")
-              setInterestSent(true)
-            }}
-            disabled={interestSent}
-            className={`${semi} min-h-11 rounded-[9px] px-5 text-[12px] transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white ${
-              interestSent
-                ? "cursor-default bg-white/15 text-white"
-                : "bg-[#d9533f] text-[#171827] hover:bg-[#e5634d] active:scale-95"
-            }`}
-          >
-            {interestSent ? "INTERÉS REGISTRADO" : "MOSTRAR INTERÉS"}
-          </button>
-        </section>
+          </section>
+        )}
       </div>
     </main>
   )

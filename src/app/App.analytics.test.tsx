@@ -140,45 +140,58 @@ describe("analytics interface instrumentation", () => {
     expect(localAnalyticsAdapter.getEvents()).toHaveLength(1)
   })
 
-  it("tracks exact project and need events without StrictMode render duplicates", async () => {
+  it("tracks Stewart without inventing needs and tracks confirmed need interactions", async () => {
     await renderApp()
 
     expect(
       localAnalyticsAdapter.getEvents().map((event) => event.event_name),
     ).toEqual(["repository_view"])
 
-    await click(buttonByLabel("Ver resumen de Ecos de Umbra"))
+    await click(buttonByLabel("Ver resumen de Stewart"))
 
-    expect(container.querySelector("h1")?.textContent).toBe("Ecos de Umbra")
+    expect(container.querySelector("h1")?.textContent).toBe("Stewart")
+    expect(
+      container
+        .querySelector('img[alt="Arte conceptual de Stewart"]')
+        ?.getAttribute("src"),
+    ).toBe("/assets/images/gallery/StewartCard.png")
+    expect(container.textContent).toContain("Equipo por confirmar")
+    expect(container.textContent).toContain(
+      "Oportunidad de colaboración por confirmar",
+    )
+    expect(
+      container.querySelectorAll('button[aria-label^="Ver solicitud"]'),
+    ).toHaveLength(0)
+    expect(container.querySelector("button")?.textContent).not.toContain(
+      "MOSTRAR INTERÉS",
+    )
 
     expect(localAnalyticsAdapter.getEvents()).toMatchObject([
       { event_name: "repository_view" },
-
-      {
-        event_name: "collaborate_click",
-        project_id: "ecos-de-umbra",
-        target_id: "project_card",
-      },
-
       { event_name: "project_view", project_id: "ecos-de-umbra" },
     ])
+    expect(localAnalyticsAdapter.getEvents()).toHaveLength(2)
 
     await click(
-      container.querySelector('button[aria-label^="Ver solicitud de Audio"]'),
+      Array.from(container.querySelectorAll("button")).find((button) =>
+        button.textContent?.includes("Proyectos"),
+      ) ?? null,
+    )
+    await click(buttonByLabel("Ver resumen de Frecuencia Cero"))
+    await click(
+      container.querySelector(
+        'button[aria-label^="Ver solicitud de Diseño sonoro"]',
+      ),
     )
 
     expect(container.querySelector("h1")?.textContent).toBe(
       "¿Qué necesita el proyecto?",
     )
-
     expect(localAnalyticsAdapter.getEvents().at(-1)).toMatchObject({
       event_name: "need_view",
-
-      project_id: "ecos-de-umbra",
-
-      need_id: projects[0]!.needs[0]!.id,
+      project_id: "frecuencia-cero",
+      need_id: projects[1]!.needs[0]!.id,
     })
-
     expect(
       localAnalyticsAdapter
         .getEvents()
@@ -188,18 +201,12 @@ describe("analytics interface instrumentation", () => {
     const contact = container.querySelector<HTMLAnchorElement>(
       'a[href^="https://wa.me/"]',
     )
-
     expect(contact?.target).toBe("_blank")
-
     expect(contact?.href).toContain("https://wa.me/")
-
     await click(contact)
-
     expect(localAnalyticsAdapter.getEvents().at(-1)).toMatchObject({
       event_name: "contact_click",
-
-      project_id: "ecos-de-umbra",
-
+      project_id: "frecuencia-cero",
       target_id: "whatsapp",
     })
 
@@ -208,17 +215,12 @@ describe("analytics interface instrumentation", () => {
         button.textContent?.includes("APORTAR"),
       ) ?? null,
     )
-
     expect(localAnalyticsAdapter.getEvents().at(-1)).toMatchObject({
       event_name: "collaborate_click",
-
-      project_id: "ecos-de-umbra",
-
+      project_id: "frecuencia-cero",
       target_id: "need_contribution",
-
-      need_id: projects[0]!.needs[0]!.id,
+      need_id: projects[1]!.needs[0]!.id,
     })
-
     expect(
       localAnalyticsAdapter
         .getEvents()
@@ -232,7 +234,7 @@ describe("analytics interface instrumentation", () => {
   it("tracks the project interest button and separates projects", async () => {
     await renderApp()
 
-    await click(buttonByLabel("Ver resumen de Ecos de Umbra"))
+    await click(buttonByLabel("Ver resumen de Stewart"))
 
     await click(
       Array.from(container.querySelectorAll("button")).find((button) =>
@@ -241,6 +243,12 @@ describe("analytics interface instrumentation", () => {
     )
 
     await click(buttonByLabel("Ver resumen de Frecuencia Cero"))
+
+    const progressBar = container.querySelector('[role="progressbar"]')
+    expect(progressBar?.getAttribute("aria-valuenow")).toBe("38")
+    expect(
+      progressBar?.querySelector<HTMLElement>(".progress__fill")?.style.width,
+    ).toBe("38%")
 
     const events = localAnalyticsAdapter.getEvents()
 
@@ -255,11 +263,6 @@ describe("analytics interface instrumentation", () => {
     expect(
       events.filter((event) => event.event_name === "collaborate_click"),
     ).toEqual([
-      expect.objectContaining({
-        project_id: "ecos-de-umbra",
-        target_id: "project_card",
-      }),
-
       expect.objectContaining({
         project_id: "frecuencia-cero",
         target_id: "project_card",
@@ -300,7 +303,7 @@ describe("analytics interface instrumentation", () => {
       window.dispatchEvent(new PopStateEvent("popstate"))
     })
 
-    expect(container.querySelector("h1")?.textContent).toBe("Ecos de Umbra")
+    expect(container.querySelector("h1")?.textContent).toBe("Stewart")
     expect(localAnalyticsAdapter.getEvents()).toMatchObject([
       { event_name: "repository_view" },
       { event_name: "project_view", project_id: "ecos-de-umbra" },

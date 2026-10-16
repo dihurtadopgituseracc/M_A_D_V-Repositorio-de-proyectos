@@ -6,7 +6,7 @@ import { isAnalyticsEvent } from "./analytics.types"
 
 const occurredAt = "2026-10-14T12:00:00.000Z"
 
-const project = projects[0]!
+const project = projects.find((candidate) => candidate.needs.length > 0)!
 
 const need = project.needs[0]!
 
@@ -88,7 +88,10 @@ describe("isAnalyticsEvent", () => {
       event({
         event_name: "need_view",
 
-        need_id: projects[1]!.needs[0]!.id,
+        project_id: projects.find((candidate) => candidate.needs.length === 0)!
+          .id,
+
+        need_id: need.id,
       }),
     ],
 

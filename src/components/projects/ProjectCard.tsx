@@ -21,7 +21,9 @@ export default function ProjectCard({
             {project.stage}
           </p>
           <p className={`${reg} text-[11px] text-[#6b6a73]`}>
-            {project.progress}% completado
+            {project.progress === null
+              ? "Avance por confirmar"
+              : `${project.progress}% completado`}
           </p>
         </div>
         <h2
@@ -64,21 +66,27 @@ export default function ProjectCard({
           <div className="flex min-h-[96px] items-center justify-between gap-4 rounded-[18px] bg-[#171827] px-4 py-4">
             <div>
               <p className={`${semi} text-[16px] text-white`}>
-                ¿Te interesa aportar?
+                {project.needs.length > 0
+                  ? "¿Te interesa aportar?"
+                  : "Oportunidad por confirmar"}
               </p>
               <p className={`${reg} mt-1.5 text-[12px] text-[#e9e7df]`}>
-                Conoce el proyecto y sus necesidades
+                {project.needs.length > 0
+                  ? "Conoce el proyecto y sus necesidades"
+                  : "El equipo confirmará las tareas abiertas"}
               </p>
             </div>
             <button
               onClick={() => {
-                trackCollaborateClick(project.id, "project_card")
+                if (project.needs.length > 0) {
+                  trackCollaborateClick(project.id, "project_card")
+                }
                 onCollaborate()
               }}
               className={`${semi} min-h-10 shrink-0 rounded-[8px] bg-[#d9533f] px-4 text-[11px] text-[#171827] shadow-[0_5px_16px_rgba(217,83,63,0.24)] transition hover:bg-[#e5634d] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white active:scale-95`}
               aria-label={`Ver resumen de ${project.title}`}
             >
-              COLABORAR
+              {project.needs.length > 0 ? "COLABORAR" : "VER PROYECTO"}
             </button>
           </div>
         </div>

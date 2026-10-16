@@ -31,13 +31,15 @@ Aplicación web para explorar proyectos de videojuegos, revisar su avance y sus 
 │   └── assets/
 │       ├── images/               # Imágenes compartidas; URL pública /assets/images/
 │       │   ├── LogoMADV.svg      # Logo de la landing
+│       │   └── gallery/
+│       │       └── StewartCard.png # Arte conceptual usado por Stewart
 │       ├── Titulo.svg            # Lámina de título para la galería
 │       ├── Contexto1.svg         # Lámina de contexto
 │       ├── Objetivos.svg         # Lámina de objetivos
 │       ├── Problemas.svg         # Lámina de problemas
 │       ├── Roadmap.svg           # Lámina de roadmap
 │       ├── Usuario.svg           # Lámina de usuario
-│       └── otros SVG             # Recursos; 15352.svg se usa en Progress
+│       └── otros SVG             # Recursos visuales de las láminas
 └── src/
     ├── main.tsx                  # Montaje de React e importación de CSS
     ├── App.tsx                   # Fachada hacia app/App.tsx
@@ -51,7 +53,7 @@ Aplicación web para explorar proyectos de videojuegos, revisar su avance y sus 
     ├── components/
     │   ├── common/
     │   │   ├── ArtPlaceholder.tsx # Arte conceptual decorativo con color por proyecto
-    │   │   ├── Progress.tsx       # Barra de avance accesible
+    │   │   ├── Progress.tsx       # Barra de avance accesible con relleno CSS
     │   │   ├── SocialIcon.tsx     # Iconos de contacto social
     │   │   ├── Tag.tsx            # Etiqueta visual reutilizable
     │   │   └── ToolCard.tsx       # Presentación de una herramienta/área
@@ -97,6 +99,7 @@ Aplicación web para explorar proyectos de videojuegos, revisar su avance y sus 
 - La analítica considera nueva vista el arranque de un documento, una apertura explícita de página por navegación o una transición `popstate`. `main.tsx` registra la vista inicial fuera de React y la protege contra reevaluaciones HMR; no se usan efectos de montaje para contar vistas, por lo que `StrictMode` y los renders repetidos no las duplican.
 - Las necesidades tienen IDs canónicos en `src/data/projects.ts`, añadidos al modelo porque no existían antes. Los eventos usan esos IDs junto con el ID original del proyecto; no fabrican identificadores durante el registro.
 - `ProjectDetailPage` muestra el resumen y estado del proyecto, las herramientas, sus solicitudes y un QR generado en tiempo de ejecución con `qrcode.react` (`QRCodeSVG`). El QR apunta a la URL actual con el ID del proyecto; no existe un archivo SVG de QR guardado en el repositorio.
+- `ProjectCard` y `ProjectDetailPage` muestran el arte opcional `Project.artImage`; si el equipo/progreso no está confirmado, `team` y `progress` aceptan `null` y la interfaz muestra “por confirmar” sin dibujar porcentajes ficticios.
 - Al seleccionar una solicitud, `NeedDetailPage` muestra sus requisitos, entregable y contactos. Esa selección es estado local y no tiene una URL propia.
 - Los botones para mostrar interés/aportar cambian el estado de la interfaz, pero no envían ni guardan información en un servidor.
 
@@ -191,7 +194,9 @@ Errores previstos: `400` ID mal formado, `404` proyecto inexistente y `429` lím
 - `Tool`: área y detalle.
 - `Contact`: tipo (`whatsapp`, `instagram` o `discord`), etiqueta, identificador visible y URL.
 
-`src/data/projects.ts` contiene actualmente los ejemplos `ecos-de-umbra` y `frecuencia-cero`. Para agregar o modificar proyectos, actualizar ese catálogo respetando los tipos y los IDs estables, ya que los IDs también forman parte de las URLs y los QR.
+`src/data/projects.ts` contiene actualmente a Stewart y Frecuencia Cero. El primer registro conserva deliberadamente el ID estable `ecos-de-umbra` para mantener los enlaces y QR ya emitidos; el siguiente reemplazo del ID requiere una migración explícita para no mezclar analítica ni romper enlaces.
+
+Stewart usa el arte conceptual `public/assets/images/gallery/StewartCard.png`. El GDD describe un ARPG de aventura, fantasía ligera y comedia, con siete reinos inspirados en Colombia, exploración top-down, combate lateral y un sistema de empatía. El equipo activo y el progreso no están confirmados; por eso `team` y `progress` son `null`. Las necesidades y contactos permanecen vacíos hasta que el equipo confirme oportunidades reales.
 
 ## Estilos y marca
 

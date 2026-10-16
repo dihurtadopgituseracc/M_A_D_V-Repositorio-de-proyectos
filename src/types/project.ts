@@ -30,8 +30,8 @@ export type Project = {
   title: string
   shortTitle: string
   genre: string
-  team: number
-  progress: number
+  team: number | null
+  progress: number | null
   stage: string
   status: string
   eyebrow: string
@@ -42,4 +42,5 @@ export type Project = {
   contacts: Contact[]
   accent: string
   artLabel: string
+  artImage?: string
 }
