@@ -154,7 +154,7 @@ describe("analytics interface instrumentation", () => {
       container
         .querySelector('img[alt="Arte conceptual de Stewart"]')
         ?.getAttribute("src"),
-    ).toBe("/assets/images/gallery/StewartCard.png")
+    ).toBe("/assets/StewartCard.png")
     expect(container.textContent).toContain("Equipo por confirmar")
     expect(container.textContent).toContain(
       "Oportunidad de colaboración por confirmar",

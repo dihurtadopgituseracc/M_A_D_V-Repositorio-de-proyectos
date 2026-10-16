@@ -29,10 +29,9 @@ Aplicación web para explorar proyectos de videojuegos, revisar su avance y sus 
 ├── PROJECT_CONTEXT.md            # Este mapa de contexto mantenido
 ├── public/
 │   └── assets/
+│       ├── StewartCard.png       # Arte conceptual usado por Stewart
 │       ├── images/               # Imágenes compartidas; URL pública relativa a BASE_URL
 │       │   ├── LogoMADV.svg      # Logo de la landing
-│       │   └── gallery/
-│       │       └── StewartCard.png # Arte conceptual usado por Stewart
 │       ├── Titulo.svg            # Lámina de título para la galería
 │       ├── Contexto1.svg         # Lámina de contexto
 │       ├── Objetivos.svg         # Lámina de objetivos
@@ -196,7 +195,7 @@ Errores previstos: `400` ID mal formado, `404` proyecto inexistente y `429` lím
 
 `src/data/projects.ts` contiene actualmente a Stewart y Frecuencia Cero. El primer registro conserva deliberadamente el ID estable `ecos-de-umbra` para mantener los enlaces y QR ya emitidos; el siguiente reemplazo del ID requiere una migración explícita para no mezclar analítica ni romper enlaces.
 
-Stewart usa el arte conceptual `public/assets/images/gallery/StewartCard.png`, con una URL formada desde `import.meta.env.BASE_URL` para funcionar también en despliegues bajo una subruta. El GDD describe un ARPG de aventura, fantasía ligera y comedia, con siete reinos inspirados en Colombia, exploración top-down, combate lateral y un sistema de empatía. El equipo activo y el progreso no están confirmados; por eso `team` y `progress` son `null`. Las necesidades y contactos permanecen vacíos hasta que el equipo confirme oportunidades reales.
+Stewart usa el arte conceptual `public/assets/StewartCard.png`, con una URL formada desde `import.meta.env.BASE_URL` para funcionar también en despliegues bajo una subruta. El GDD describe un ARPG de aventura, fantasía ligera y comedia, con siete reinos inspirados en Colombia, exploración top-down, combate lateral y un sistema de empatía. El equipo activo y el progreso no están confirmados; por eso `team` y `progress` son `null`. Las necesidades y contactos permanecen vacíos hasta que el equipo confirme oportunidades reales.
 
 ## Estilos y marca
 
