@@ -24,7 +24,7 @@ export const projects: Project[] = [
     contacts: [],
     accent: "#dca039",
     artLabel: "STEWART · ARTE CONCEPTUAL",
-    artImage: "/assets/images/gallery/StewartCard.png",
+    artImage: `${import.meta.env.BASE_URL}assets/images/gallery/StewartCard.png`,
   },
   {
     id: "frecuencia-cero",

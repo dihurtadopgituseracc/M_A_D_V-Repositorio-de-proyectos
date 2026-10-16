@@ -29,7 +29,7 @@ Aplicación web para explorar proyectos de videojuegos, revisar su avance y sus 
 ├── PROJECT_CONTEXT.md            # Este mapa de contexto mantenido
 ├── public/
 │   └── assets/
-│       ├── images/               # Imágenes compartidas; URL pública /assets/images/
+│       ├── images/               # Imágenes compartidas; URL pública relativa a BASE_URL
 │       │   ├── LogoMADV.svg      # Logo de la landing
 │       │   └── gallery/
 │       │       └── StewartCard.png # Arte conceptual usado por Stewart
@@ -90,7 +90,7 @@ Aplicación web para explorar proyectos de videojuegos, revisar su avance y sus 
 - La raíz (`/`) muestra `LandingPage`. El CTA “Repositorio abierto” navega a `?vista=repository`; “Saber más del proyecto” abre `?vista=gallery`.
 - `GalleryPage` presenta las seis láminas SVG `Titulo.svg`, `Contexto1.svg`, `Objetivos.svg`, `Problemas.svg`, `Roadmap.svg` y `Usuario.svg` desde `/assets/`, en una columna móvil, dos columnas en tablet y tres en escritorio. Al pulsar una se abre un visor 16:9 a pantalla completa con navegación, cierre y soporte de teclado; si un SVG no carga, se muestra su nombre como fallback.
 - La landing presenta cantidades calculadas del catálogo local y una lista breve de los proyectos existentes. No añade proyectos ni modifica el catálogo.
-- Los recursos visuales compartidos van en `public/assets/` y se referencian desde la web con `/assets/<archivo>`. El logo de MADV se encuentra en `public/assets/images/LogoMADV.svg` y se usa en el encabezado de la landing. Las seis láminas SVG de la galería ya se encuentran en la raíz de assets.
+- Los recursos visuales compartidos van en `public/assets/` y se referencian desde la web anteponiendo `import.meta.env.BASE_URL` a `assets/<archivo>` para respetar la base de despliegue. El logo de MADV se encuentra en `public/assets/images/LogoMADV.svg` y se usa en el encabezado de la landing. Las seis láminas SVG de la galería ya se encuentran en la raíz de assets.
 - `repository_view` se registra al entrar al listado, no al visitar la landing. `trackCurrentPageView` distingue el listado mediante `vista=repository`.
 - Al seleccionar un proyecto, `app/App.tsx` actualiza el estado y agrega su ID a la query string: `?proyecto=<id>`.
 - `proyecto=<id>` tiene prioridad sobre `vista`; por ello los enlaces directos y QR existentes continúan abriendo la ficha del proyecto.
@@ -196,7 +196,7 @@ Errores previstos: `400` ID mal formado, `404` proyecto inexistente y `429` lím
 
 `src/data/projects.ts` contiene actualmente a Stewart y Frecuencia Cero. El primer registro conserva deliberadamente el ID estable `ecos-de-umbra` para mantener los enlaces y QR ya emitidos; el siguiente reemplazo del ID requiere una migración explícita para no mezclar analítica ni romper enlaces.
 
-Stewart usa el arte conceptual `public/assets/images/gallery/StewartCard.png`. El GDD describe un ARPG de aventura, fantasía ligera y comedia, con siete reinos inspirados en Colombia, exploración top-down, combate lateral y un sistema de empatía. El equipo activo y el progreso no están confirmados; por eso `team` y `progress` son `null`. Las necesidades y contactos permanecen vacíos hasta que el equipo confirme oportunidades reales.
+Stewart usa el arte conceptual `public/assets/images/gallery/StewartCard.png`, con una URL formada desde `import.meta.env.BASE_URL` para funcionar también en despliegues bajo una subruta. El GDD describe un ARPG de aventura, fantasía ligera y comedia, con siete reinos inspirados en Colombia, exploración top-down, combate lateral y un sistema de empatía. El equipo activo y el progreso no están confirmados; por eso `team` y `progress` son `null`. Las necesidades y contactos permanecen vacíos hasta que el equipo confirme oportunidades reales.
 
 ## Estilos y marca
 
