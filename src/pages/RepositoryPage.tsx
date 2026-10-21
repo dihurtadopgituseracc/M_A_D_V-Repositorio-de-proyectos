@@ -55,6 +55,7 @@ export default function RepositoryPage({
           <ProjectCard
             key={project.id}
             project={project}
+            onOpen={() => onOpen(project)}
             onCollaborate={() => onOpen(project)}
           />
         ))}
@@ -62,5 +63,3 @@ export default function RepositoryPage({
     </main>
   )
 }
-
-

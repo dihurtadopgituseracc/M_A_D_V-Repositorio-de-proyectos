@@ -5,33 +5,63 @@ import { reg, semi } from "@/constants/styles"
 const galleryItems = [
   {
     number: "01",
-    src: "/assets/Titulo.svg",
+    src: `${import.meta.env.BASE_URL}assets/Titulo.svg`,
     alt: "Título y portada de MADV",
   },
   {
     number: "02",
-    src: "/assets/Contexto1.svg",
+    src: `${import.meta.env.BASE_URL}assets/Contexto1.svg`,
     alt: "Contexto del proyecto MADV",
   },
   {
     number: "03",
-    src: "/assets/Objetivos.svg",
+    src: `${import.meta.env.BASE_URL}assets/Objetivos.svg`,
     alt: "Objetivos del proyecto MADV",
   },
   {
     number: "04",
-    src: "/assets/Problemas.svg",
+    src: `${import.meta.env.BASE_URL}assets/Problemas.svg`,
     alt: "Problemas que aborda MADV",
   },
   {
     number: "05",
-    src: "/assets/Roadmap.svg",
+    src: `${import.meta.env.BASE_URL}assets/Roadmap.svg`,
     alt: "Roadmap del proyecto MADV",
   },
   {
     number: "06",
-    src: "/assets/Usuario.svg",
+    src: `${import.meta.env.BASE_URL}assets/Usuario.svg`,
     alt: "Perfil de usuario de MADV",
+  },
+  {
+    number: "07",
+    src: `${import.meta.env.BASE_URL}assets/Contexto2.svg`,
+    alt: "Continuación del contexto del proyecto MADV",
+  },
+  {
+    number: "08",
+    src: `${import.meta.env.BASE_URL}assets/Entornos.svg`,
+    alt: "Entornos del proyecto Stewart",
+  },
+  {
+    number: "09",
+    src: `${import.meta.env.BASE_URL}assets/EntornoEsp.svg`,
+    alt: "Entorno especial del proyecto Stewart",
+  },
+  {
+    number: "10",
+    src: `${import.meta.env.BASE_URL}assets/Propuesta.svg`,
+    alt: "Propuesta del proyecto MADV",
+  },
+  {
+    number: "11",
+    src: `${import.meta.env.BASE_URL}assets/ArbolProb.svg`,
+    alt: "Árbol con problema del proyecto Stewart",
+  },
+  {
+    number: "12",
+    src: `${import.meta.env.BASE_URL}assets/ArbustoProb.svg`,
+    alt: "Arbusto con problema del proyecto Stewart",
   },
 ]
 
@@ -143,8 +173,8 @@ export default function GalleryPage({ onBack }: { onBack: () => void }) {
           <p
             className={`${reg} mt-3 max-w-[620px] text-[13px] leading-relaxed text-[#4f4e59]`}
           >
-            Un recorrido visual por los proyectos, sus mundos y las personas que
-            los están creando.
+            Un recorrido visual por MADV y los proyectos que forman parte de su
+            comunidad. Explora las 12 imágenes para verlas en detalle.
           </p>
 
           <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5 lg:grid-cols-3">
@@ -185,7 +215,8 @@ export default function GalleryPage({ onBack }: { onBack: () => void }) {
         >
           <div className="flex items-center justify-between gap-4">
             <p className={`${semi} text-[12px]`}>
-              MADV · {activeItem.number} / 06
+              MADV · {activeItem.number} /{" "}
+              {String(galleryItems.length).padStart(2, "0")}
             </p>
             <button
               type="button"

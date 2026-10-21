@@ -97,7 +97,7 @@ describe("analytics interface instrumentation", () => {
     expect(container.querySelector("h1")?.textContent).toBe("Imágenes de MADV")
     expect(
       container.querySelectorAll('button[aria-label^="Abrir imagen"]'),
-    ).toHaveLength(6)
+    ).toHaveLength(12)
     expect(
       Array.from(container.querySelectorAll("img")).map((image) =>
         image.getAttribute("src"),
@@ -109,6 +109,12 @@ describe("analytics interface instrumentation", () => {
       "/assets/Problemas.svg",
       "/assets/Roadmap.svg",
       "/assets/Usuario.svg",
+      "/assets/Contexto2.svg",
+      "/assets/Entornos.svg",
+      "/assets/EntornoEsp.svg",
+      "/assets/Propuesta.svg",
+      "/assets/ArbolProb.svg",
+      "/assets/ArbustoProb.svg",
     ])
     await click(container.querySelector('button[aria-label="Abrir imagen 01"]'))
     expect(container.querySelector('[role="dialog"]')).not.toBeNull()
@@ -159,6 +165,30 @@ describe("analytics interface instrumentation", () => {
     )
   })
 
+  it("opens a project from anywhere on its repository card", async () => {
+    await renderApp()
+    await click(buttonByLabel("Abrir detalles de Stewart"))
+
+    expect(window.location.search).toBe("?proyecto=ecos-de-umbra")
+    expect(container.querySelector("h1")?.textContent).toBe("Stewart")
+    expect(localAnalyticsAdapter.getEvents()).toMatchObject([
+      { event_name: "repository_view" },
+      { event_name: "project_view", project_id: "ecos-de-umbra" },
+    ])
+    expect(localAnalyticsAdapter.getEvents()).toHaveLength(2)
+  })
+
+  it("offers QR sharing and PNG download on a project page", async () => {
+    await renderApp()
+    await click(buttonByLabel("Ver resumen de Stewart"))
+
+    const buttonTexts = Array.from(container.querySelectorAll("button")).map(
+      (button) => button.textContent,
+    )
+    expect(buttonTexts).toContain("Compartir QR")
+    expect(buttonTexts).toContain("Descargar PNG")
+  })
+
   it("tracks Stewart without inventing needs and tracks confirmed need interactions", async () => {
     await renderApp()
 
@@ -178,6 +208,8 @@ describe("analytics interface instrumentation", () => {
     expect(container.textContent).toContain(
       "Oportunidad de colaboración por confirmar",
     )
+    expect(buttonByLabel("Compartir QR")).not.toBeNull()
+    expect(buttonByLabel("Descargar PNG")).not.toBeNull()
     expect(
       container.querySelectorAll('button[aria-label^="Ver solicitud"]'),
     ).toHaveLength(0)

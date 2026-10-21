@@ -73,7 +73,7 @@ Aplicación web para explorar proyectos de videojuegos, revisar su avance y sus 
     │   └── projects.ts           # Catálogo local de proyectos y contenido asociado
     ├── pages/
     │   ├── LandingPage.tsx      # Portada y resumen de MADV
-    │   ├── GalleryPage.tsx      # Galería de seis imágenes y visor 16:9
+    │   ├── GalleryPage.tsx      # Galería de 12 imágenes y visor 16:9
     │   ├── RepositoryPage.tsx    # Listado de proyectos
     │   ├── ProjectDetailPage.tsx # Detalle, avance, QR, herramientas y necesidades
     │   └── NeedDetailPage.tsx    # Detalle de una necesidad y contactos
@@ -85,11 +85,11 @@ Aplicación web para explorar proyectos de videojuegos, revisar su avance y sus 
 
 ## Navegación y vistas
 
-- `RepositoryPage` recorre `projects` y presenta una tarjeta por proyecto; el botón “Volver a MADV” regresa a la portada y elimina `vista=repository` de la URL.
+- `RepositoryPage` recorre `projects` y presenta una tarjeta por proyecto; cada tarjeta completa abre los detalles del proyecto y su botón de colaboración conserva el registro de clic. “Volver a MADV” regresa a la portada y elimina `vista=repository` de la URL.
 - La raíz (`/`) muestra `LandingPage`. El CTA “Repositorio abierto” navega a `?vista=repository`; “Saber más del proyecto” abre `?vista=gallery`.
-- `GalleryPage` presenta las seis láminas SVG `Titulo.svg`, `Contexto1.svg`, `Objetivos.svg`, `Problemas.svg`, `Roadmap.svg` y `Usuario.svg` desde `/assets/`, en una columna móvil, dos columnas en tablet y tres en escritorio. Al pulsar una se abre un visor 16:9 a pantalla completa con navegación, cierre y soporte de teclado; si un SVG no carga, se muestra su nombre como fallback.
+- `GalleryPage` presenta `Titulo.svg`, `Contexto1.svg`, `Objetivos.svg`, `Problemas.svg`, `Roadmap.svg`, `Usuario.svg`, `Contexto2.svg`, `Entornos.svg`, `EntornoEsp.svg`, `Propuesta.svg`, `ArbolProb.svg` y `ArbustoProb.svg` desde `public/assets/`, en una columna móvil, dos columnas en tablet y tres en escritorio. Al pulsar una se abre un visor 16:9 a pantalla completa con navegación, cierre y soporte de teclado; si un SVG no carga, se muestra su nombre como fallback.
 - La landing presenta cantidades calculadas del catálogo local y una lista breve de los proyectos existentes. No añade proyectos ni modifica el catálogo.
-- Los recursos visuales compartidos van en `public/assets/` y se referencian desde la web anteponiendo `import.meta.env.BASE_URL` a `assets/<archivo>` para respetar la base de despliegue. El logo de MADV se encuentra en `public/assets/images/LogoMADV.svg` y se usa en el encabezado de la landing. Las seis láminas SVG de la galería ya se encuentran en la raíz de assets.
+- Los recursos visuales compartidos van en `public/assets/` y se referencian desde la web anteponiendo `import.meta.env.BASE_URL` a `assets/<archivo>` para respetar la base de despliegue. El logo de MADV se encuentra en `public/assets/images/LogoMADV.svg` y se usa en el encabezado de la landing. Las láminas de la galería se encuentran en la raíz de assets.
 - `repository_view` se registra al entrar al listado, no al visitar la landing. `trackCurrentPageView` distingue el listado mediante `vista=repository`.
 - Al seleccionar un proyecto, `app/App.tsx` actualiza el estado y agrega su ID a la query string: `?proyecto=<id>`.
 - `proyecto=<id>` tiene prioridad sobre `vista`; por ello los enlaces directos y QR existentes continúan abriendo la ficha del proyecto.
@@ -97,7 +97,7 @@ Aplicación web para explorar proyectos de videojuegos, revisar su avance y sus 
 - El botón de regreso al repositorio elimina el parámetro `proyecto`.
 - La analítica considera nueva vista el arranque de un documento, una apertura explícita de página por navegación o una transición `popstate`. `main.tsx` registra la vista inicial fuera de React y la protege contra reevaluaciones HMR; no se usan efectos de montaje para contar vistas, por lo que `StrictMode` y los renders repetidos no las duplican.
 - Las necesidades tienen IDs canónicos en `src/data/projects.ts`, añadidos al modelo porque no existían antes. Los eventos usan esos IDs junto con el ID original del proyecto; no fabrican identificadores durante el registro.
-- `ProjectDetailPage` muestra el resumen y estado del proyecto, las herramientas, sus solicitudes y un QR generado en tiempo de ejecución con `qrcode.react` (`QRCodeSVG`). El QR apunta a la URL actual con el ID del proyecto; no existe un archivo SVG de QR guardado en el repositorio.
+- `ProjectDetailPage` muestra el resumen y estado del proyecto, las herramientas, sus solicitudes y un QR generado en tiempo de ejecución con `qrcode.react` (`QRCodeSVG`). El QR apunta a la URL del proyecto y ofrece compartirlo como imagen mediante Web Share API cuando el navegador lo permite, o descargarlo como PNG.
 - `ProjectCard` y `ProjectDetailPage` muestran el arte opcional `Project.artImage`; si el equipo/progreso no está confirmado, `team` y `progress` aceptan `null` y la interfaz muestra “por confirmar” sin dibujar porcentajes ficticios.
 - Al seleccionar una solicitud, `NeedDetailPage` muestra sus requisitos, entregable y contactos. Esa selección es estado local y no tiene una URL propia.
 - Los botones para mostrar interés/aportar cambian el estado de la interfaz, pero no envían ni guardan información en un servidor.
