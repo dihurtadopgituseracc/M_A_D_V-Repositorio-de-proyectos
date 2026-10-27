@@ -78,7 +78,7 @@ Aplicación web para explorar proyectos de videojuegos, revisar su avance y sus 
     │   ├── ProjectDetailPage.tsx # Detalle, avance, QR, herramientas y necesidades
     │   └── NeedDetailPage.tsx    # Detalle de una necesidad y contactos
     ├── types/
-    │   └── project.ts            # Tipos Project, Need, Tool y Contact
+    │   └── project.ts            # Tipos Project, Need, Tool, Contact y secciones de detalle
     └── utils/
         └── scroll.ts             # Desplazamiento al inicio al navegar
 ```
@@ -189,13 +189,17 @@ Errores previstos: `400` ID mal formado, `404` proyecto inexistente y `429` lím
 `src/types/project.ts` define:
 
 - `Project`: identificador, título, género, equipo, avance, etapa, estado, descripción, herramientas, etiquetas, necesidades, contactos, acento y etiqueta de arte.
-- `Need`: nombre, detalle, dedicación, herramienta, descripción, requisitos, entregable y marca opcional `featured`.
+- `Need`: nombre, detalle, dedicación, herramienta, descripción, requisitos, entregable, estado opcional `proposed` para propuestas inferidas sin vacante confirmada y marca opcional `featured`.
 - `Tool`: área y detalle.
 - `Contact`: tipo (`whatsapp`, `instagram` o `discord`), etiqueta, identificador visible y URL.
 
-`src/data/projects.ts` contiene actualmente a Stewart y Frecuencia Cero. El primer registro conserva deliberadamente el ID estable `ecos-de-umbra` para mantener los enlaces y QR ya emitidos; el siguiente reemplazo del ID requiere una migración explícita para no mezclar analítica ni romper enlaces.
+`src/data/projects.ts` contiene actualmente a Stewart, Frecuencia Cero, Beat The World y Beast Card Clash. El primer registro conserva deliberadamente el ID estable `ecos-de-umbra` para mantener los enlaces y QR ya emitidos; el siguiente reemplazo del ID requiere una migración explícita para no mezclar analítica ni romper enlaces.
 
 Stewart usa el arte conceptual `public/assets/StewartCard.svg`, con una URL formada desde `import.meta.env.BASE_URL` para funcionar también en despliegues bajo una subruta. El SVG se versiona directamente en Git para evitar la dependencia de Git LFS que tenía la imagen PNG anterior. El GDD describe un ARPG de aventura, fantasía ligera y comedia, con siete reinos inspirados en Colombia, exploración top-down, combate lateral y un sistema de empatía. El equipo activo y el progreso no están confirmados; por eso `team` y `progress` son `null`. Las necesidades y contactos permanecen vacíos hasta que el equipo confirme oportunidades reales.
+
+Beat The World se incorporó desde `Beat_The_World_matriz_repositorio.xlsx`. Su ficha sigue el formato conciso de Frecuencia Cero: resumen, etapa y estado, género, avance, herramientas, etiquetas y colaboraciones. El GDD no declara solicitudes de colaboración; las dos ideas de apoyo derivadas de gameplay y del analizador musical se marcan `proposed` y requieren validación, no son vacantes abiertas.
+
+Beast Card Clash se incorporó desde `Beast_Card_Clash_matriz_repositorio.xlsx` con el mismo formato conciso. La ficha resume la demo de cartas por turnos y narrativa point-and-click, el motor Godot y herramientas principales. El GDD menciona perfiles de arte, sonido, programación y organización; las propuestas de arte digital y programación en Godot se marcan `proposed` hasta que el equipo confirme su vigencia. Las propuestas no se contabilizan como oportunidades abiertas y no afirman disponibilidad.
 
 ## Estilos y marca
 

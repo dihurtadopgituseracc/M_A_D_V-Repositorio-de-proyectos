@@ -27,21 +27,21 @@ export default function RepositoryPage({
           <div className="flex flex-col justify-between gap-5 border-b border-[#363636]/15 pb-6 sm:flex-row sm:items-end">
             <div>
               <p
-                className={`${semi} text-[11px] uppercase tracking-[0.18em] text-[#363636]`}
+                className={`${semi} text-[18px] uppercase tracking-[0.18em] text-[#363636]`}
               >
                 Repositorio abierto
               </p>
               <h1
-                className={`${semi} mt-2 max-w-2xl text-[34px] tracking-[-0.03em] text-[#363636] sm:text-[44px]`}
+                className={`${semi} mt-4 max-w-2xl text-[34px] tracking-[-0.03em] text-[#363636] sm:text-[44px]`}
               >
-                Proyectos que buscan nuevas manos
+                Proyectos que buscan colaboraciónes 
               </h1>
             </div>
             <p
-              className={`${reg} max-w-[330px] text-[13px] leading-[1.5] text-[#555555] sm:text-right`}
+              className={`${reg} max-w-[330px] text-[16px] leading-[1.5] text-[#555555] sm:text-right`}
             >
               Explora prototipos activos, conoce su avance y encuentra una
-              colaboración concreta.
+              colaboración concreta. :D
             </p>
           </div>
         </div>

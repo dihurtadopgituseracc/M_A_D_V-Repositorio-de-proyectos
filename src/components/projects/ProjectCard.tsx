@@ -13,6 +13,13 @@ export default function ProjectCard({
   onOpen: () => void
   onCollaborate: () => void
 }) {
+  const confirmedNeeds = project.needs.filter(
+    (need) => need.status !== "proposed",
+  )
+  const hasProposedNeeds = project.needs.some(
+    (need) => need.status === "proposed",
+  )
+
   return (
     <article className="group relative isolate flex h-full flex-col rounded-[24px] border border-white/70 bg-[#dededc] p-2 shadow-[0_18px_45px_rgba(23,24,39,0.07)] transition duration-300 hover:-translate-y-1 hover:shadow-[0_24px_55px_rgba(23,24,39,0.12)]">
       <button
@@ -50,7 +57,7 @@ export default function ProjectCard({
         />
         <div className="flex flex-1 flex-col px-3 pb-3 pt-5 sm:px-4">
           <h3 className={`${semi} text-[20px] text-[#171827]`}>
-            Proyecto en 6 líneas
+            Proyecto en 6 líneas-sinòpsis
           </h3>
           <p
             className={`${reg} mt-2 text-pretty text-[12px] leading-[1.45] text-[#6b6a73]`}
@@ -75,19 +82,23 @@ export default function ProjectCard({
             <div className="flex min-h-[96px] items-center justify-between gap-4 rounded-[18px] bg-[#171827] px-4 py-4">
               <div>
                 <p className={`${semi} text-[16px] text-white`}>
-                  {project.needs.length > 0
+                  {confirmedNeeds.length > 0
                     ? "¿Te interesa aportar?"
-                    : "Oportunidad por confirmar"}
+                    : hasProposedNeeds
+                      ? "Perfiles sugeridos"
+                      : "Oportunidad por confirmar"}
                 </p>
                 <p className={`${reg} mt-1.5 text-[12px] text-[#e9e7df]`}>
-                  {project.needs.length > 0
+                  {confirmedNeeds.length > 0
                     ? "Conoce el proyecto y sus necesidades"
-                    : "El equipo confirmará las tareas abiertas"}
+                    : hasProposedNeeds
+                      ? "Propuestas por validar con el equipo"
+                      : "El equipo confirmará las tareas abiertas"}
                 </p>
               </div>
               <button
                 onClick={() => {
-                  if (project.needs.length > 0) {
+                  if (confirmedNeeds.length > 0) {
                     trackCollaborateClick(project.id, "project_card")
                   }
                   onCollaborate()
@@ -95,7 +106,11 @@ export default function ProjectCard({
                 className={`${semi} pointer-events-auto relative z-20 min-h-10 shrink-0 rounded-[8px] bg-[#d9533f] px-4 text-[11px] text-[#171827] shadow-[0_5px_16px_rgba(217,83,63,0.24)] transition hover:bg-[#e5634d] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white active:scale-95`}
                 aria-label={`Ver resumen de ${project.title}`}
               >
-                {project.needs.length > 0 ? "COLABORAR" : "VER PROYECTO"}
+                {confirmedNeeds.length > 0
+                  ? "COLABORAR"
+                  : hasProposedNeeds
+                    ? "VER PROPUESTAS"
+                    : "VER PROYECTO"}
               </button>
             </div>
           </div>

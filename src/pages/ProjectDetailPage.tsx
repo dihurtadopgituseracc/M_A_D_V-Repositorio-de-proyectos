@@ -65,6 +65,12 @@ export default function ProjectDetailPage({
 }) {
   const [interestSent, setInterestSent] = useState(false)
   const [qrMessage, setQrMessage] = useState("")
+  const confirmedNeeds = project.needs.filter(
+    (need) => need.status !== "proposed",
+  )
+  const hasProposedNeeds = project.needs.some(
+    (need) => need.status === "proposed",
+  )
   const qrContainerRef = useRef<HTMLDivElement>(null)
   const shareUrl = new URL(window.location.href)
   shareUrl.search = ""
@@ -307,25 +313,37 @@ export default function ProjectDetailPage({
             <p
               className={`${semi} text-[10px] uppercase tracking-[0.16em] text-[#d9533f]`}
             >
-              Colaboraciones abiertas
+              {confirmedNeeds.length > 0
+                ? "Colaboraciones abiertas"
+                : hasProposedNeeds
+                  ? "Propuestas por confirmar"
+                  : "Colaboraciones"}
             </p>
             <h2 className={`${semi} mt-2 text-[22px] text-[#171827]`}>
               ¿Qué necesita el proyecto?
             </h2>
             {project.needs.length > 0 ? (
-              <div className="mt-4 grid gap-3 xl:grid-cols-2">
-                {project.needs.map((need, index) => (
-                  <NeedCard
-                    key={`${need.name}-${need.detail}`}
-                    need={need}
-                    index={index}
-                    onOpen={() => {
-                      trackNeedView(project.id, need.id)
-                      onOpenNeed(need, index)
-                    }}
-                  />
-                ))}
-              </div>
+              <>
+                {hasProposedNeeds && (
+                  <p className={`${reg} mt-3 text-[13px] text-[#6b6a73]`}>
+                    Propuestas basadas en la matriz; el equipo debe confirmar su
+                    vigencia y alcance.
+                  </p>
+                )}
+                <div className="mt-4 grid gap-3 xl:grid-cols-2">
+                  {project.needs.map((need, index) => (
+                    <NeedCard
+                      key={`${need.name}-${need.detail}`}
+                      need={need}
+                      index={index}
+                      onOpen={() => {
+                        trackNeedView(project.id, need.id)
+                        onOpenNeed(need, index)
+                      }}
+                    />
+                  ))}
+                </div>
+              </>
             ) : (
               <p className={`${reg} mt-3 text-[13px] text-[#6b6a73]`}>
                 Las tareas abiertas y el tipo de apoyo están por confirmar con
@@ -335,7 +353,7 @@ export default function ProjectDetailPage({
           </div>
         </section>
 
-        {project.needs.length > 0 ? (
+        {confirmedNeeds.length > 0 ? (
           <section
             className="mt-10 flex flex-col justify-between gap-5 rounded-[22px] bg-[#171827] px-6 py-6 sm:flex-row sm:items-center sm:px-8"
             aria-live="polite"
@@ -367,14 +385,24 @@ export default function ProjectDetailPage({
               {interestSent ? "INTERÉS REGISTRADO" : "MOSTRAR INTERÉS"}
             </button>
           </section>
+        ) : hasProposedNeeds ? (
+          <section className="mt-10 rounded-[22px] bg-[#171827] px-6 py-6 sm:px-8">
+            <p className={`${semi} text-[18px] text-white`}>
+              Propuestas por confirmar
+            </p>
+            <p className={`${reg} mt-1 text-[12px] text-[#e9e7df]`}>
+              Estas ideas no son vacantes confirmadas. El equipo debe validar
+              las necesidades antes de abrir colaboraciones.
+            </p>
+          </section>
         ) : (
           <section className="mt-10 rounded-[22px] bg-[#171827] px-6 py-6 sm:px-8">
             <p className={`${semi} text-[18px] text-white`}>
               Oportunidad de colaboración por confirmar
             </p>
             <p className={`${reg} mt-1 text-[12px] text-[#e9e7df]`}>
-              El GDD menciona recibir retroalimentación, pero el equipo aún debe
-              confirmar las tareas abiertas y el tipo de ayuda que necesita.
+              El equipo aún debe confirmar qué tareas están abiertas y qué tipo
+              de apoyo necesita.
             </p>
           </section>
         )}

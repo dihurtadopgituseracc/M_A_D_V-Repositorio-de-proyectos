@@ -10,7 +10,8 @@ export default function LandingPage({
   onOpenGallery: () => void
 }) {
   const openNeeds = projects.reduce(
-    (total, project) => total + project.needs.length,
+    (total, project) =>
+      total + project.needs.filter((need) => need.status !== "proposed").length,
 
     0,
   )
@@ -62,7 +63,7 @@ export default function LandingPage({
                 type="button"
                 onClick={onOpenRepository}
                 aria-label="Repositorio abierto"
-                className={`${semi} inline-flex min-h-12 items-center justify-center gap-3 rounded-[8px] bg-[#171827] px-5 text-[13px] text-white transition hover:bg-[#287b86] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#171827]`}
+                className={`${semi} inline-flex min-h-12 items-center justify-center gap-3 rounded-[1px] bg-[#171827] px-5 text-[13px] text-white transition hover:bg-[#287b86] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#171827]`}
               >
                 Repositorio abierto
                 <span aria-hidden="true">→</span>
@@ -70,7 +71,7 @@ export default function LandingPage({
               <button
                 type="button"
                 onClick={onOpenGallery}
-                className={`${semi} inline-flex min-h-12 items-center justify-center gap-3 rounded-[8px] border border-[#363636]/35 px-5 text-[13px] text-[#171827] transition hover:bg-white/45 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#171827]`}
+                className={`${semi} inline-flex min-h-12 items-center justify-center gap-3 rounded-[1px] border border-[#363636]/35 px-5 text-[13px] text-[#171827] transition hover:bg-white/45 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#171827]`}
               >
                 Saber más del proyecto
                 <span aria-hidden="true">↓</span>
@@ -78,13 +79,13 @@ export default function LandingPage({
             </div>
 
             <div className="mt-14 flex flex-wrap gap-x-10 gap-y-4 border-t border-[#363636]/20 pt-5">
-              <p className={`${reg} text-[12px] text-[#4f4e59]`}>
+              <p className={`${reg} text-[40px] text-[#4f4e59]`}>
                 <span className={`${semi} mr-2 text-[#171827]`}>
                   {String(projects.length).padStart(2, "0")}
                 </span>
                 proyectos abiertos
               </p>
-              <p className={`${reg} text-[12px] text-[#4f4e59]`}>
+              <p className={`${reg} text-[40px] text-[#4f4e59]`}>
                 <span className={`${semi} mr-2 text-[#171827]`}>
                   {String(openNeeds).padStart(2, "0")}
                 </span>

@@ -138,7 +138,7 @@ describe("analytics interface instrumentation", () => {
 
     expect(window.location.search).toBe("?vista=repository")
     expect(container.querySelector("h1")?.textContent).toBe(
-      "Proyectos que buscan nuevas manos",
+      "Proyectos que buscan colaboraciónes",
     )
     expect(localAnalyticsAdapter.getEvents()).toMatchObject([
       { event_name: "repository_view" },
@@ -150,7 +150,7 @@ describe("analytics interface instrumentation", () => {
     await renderApp("/?vista=repository")
 
     expect(container.querySelector("h1")?.textContent).toBe(
-      "Proyectos que buscan nuevas manos",
+      "Proyectos que buscan colaboraciónes",
     )
 
     await click(
@@ -176,6 +176,93 @@ describe("analytics interface instrumentation", () => {
       { event_name: "project_view", project_id: "ecos-de-umbra" },
     ])
     expect(localAnalyticsAdapter.getEvents()).toHaveLength(2)
+  })
+
+  it("shows Beat The World using the concise project detail layout", async () => {
+    await renderApp()
+    await click(buttonByLabel("Abrir detalles de Beat The World"))
+
+    expect(window.location.search).toBe("?proyecto=beat-the-world")
+    expect(container.querySelector("h1")?.textContent).toBe("Beat The World")
+    expect(container.textContent).toContain("15%")
+    expect(container.textContent).toContain("1 integrantes")
+    expect(container.textContent).toContain("Unity 6000.3.9f1")
+    expect(container.textContent).not.toContain("Información ampliada")
+    expect(container.textContent).not.toContain("Referentes y evolución futura")
+    expect(container.textContent).toContain(
+      "Propuestas basadas en la matriz; el equipo debe confirmar su vigencia y alcance.",
+    )
+    expect(
+      container.querySelectorAll('button[aria-label^="Ver propuesta"]'),
+    ).toHaveLength(2)
+    expect(localAnalyticsAdapter.getEvents()).toMatchObject([
+      { event_name: "repository_view" },
+      { event_name: "project_view", project_id: "beat-the-world" },
+    ])
+  })
+
+  it("shows Beast Card Clash with concise, verified project information", async () => {
+    await renderApp()
+    await click(buttonByLabel("Abrir detalles de Beast Card Clash (BCC)"))
+
+    expect(window.location.search).toBe("?proyecto=beast-card-clash")
+    expect(container.querySelector("h1")?.textContent).toBe(
+      "Beast Card Clash (BCC)",
+    )
+    expect(container.textContent).toContain("Desarrollo de demo")
+    expect(container.textContent).toContain("4 integrantes")
+    expect(
+      container
+        .querySelector('[role="progressbar"]')
+        ?.getAttribute("aria-valuenow"),
+    ).toBe("30")
+    expect(container.textContent).toContain("Veritas Académica")
+    expect(container.textContent).toContain("Godot · GDScript")
+    expect(container.textContent).toContain("Veld Bears · PC Windows")
+    expect(container.textContent).toContain("Point-and-click")
+    expect(container.textContent).toContain(
+      "Necesidades de arte, sonido, programación y organización por confirmar.",
+    )
+    expect(container.textContent).not.toContain("Información ampliada")
+    expect(
+      container.querySelectorAll('button[aria-label^="Ver propuesta"]'),
+    ).toHaveLength(2)
+    expect(localAnalyticsAdapter.getEvents()).toMatchObject([
+      { event_name: "repository_view" },
+      { event_name: "project_view", project_id: "beast-card-clash" },
+    ])
+  })
+
+  it("labels inferred needs as proposals and does not report them as sent requests", async () => {
+    await renderApp()
+    await click(buttonByLabel("Abrir detalles de Beat The World"))
+    await click(
+      container.querySelector(
+        'button[aria-label^="Ver propuesta de Programación de gameplay rítmico"]',
+      ),
+    )
+
+    expect(container.textContent).toContain("Propuesta inferida de la matriz")
+    expect(
+      Array.from(container.querySelectorAll("button")).some((button) =>
+        button.textContent?.includes("EXPRESAR INTERÉS"),
+      ),
+    ).toBe(true)
+    await click(
+      Array.from(container.querySelectorAll("button")).find((button) =>
+        button.textContent?.includes("EXPRESAR INTERÉS"),
+      ) ?? null,
+    )
+    expect(container.textContent).toContain(
+      "El interés quedó marcado en esta interfaz",
+    )
+    expect(container.textContent).not.toContain("SOLICITUD ENVIADA")
+    expect(localAnalyticsAdapter.getEvents().at(-1)).toMatchObject({
+      event_name: "collaborate_click",
+      project_id: "beat-the-world",
+      target_id: "need_contribution",
+      need_id: "beat-the-world-gameplay",
+    })
   })
 
   it("offers QR sharing and PNG download on a project page", async () => {
@@ -204,12 +291,15 @@ describe("analytics interface instrumentation", () => {
         .querySelector('img[alt="Arte conceptual de Stewart"]')
         ?.getAttribute("src"),
     ).toBe("/assets/StewartCard.svg")
-    expect(container.textContent).toContain("Equipo por confirmar")
+    expect(container.textContent).toContain("2 integrantes")
     expect(container.textContent).toContain(
       "Oportunidad de colaboración por confirmar",
     )
-    expect(buttonByLabel("Compartir QR")).not.toBeNull()
-    expect(buttonByLabel("Descargar PNG")).not.toBeNull()
+    const projectButtons = Array.from(container.querySelectorAll("button")).map(
+      (button) => button.textContent,
+    )
+    expect(projectButtons).toContain("Compartir QR")
+    expect(projectButtons).toContain("Descargar PNG")
     expect(
       container.querySelectorAll('button[aria-label^="Ver solicitud"]'),
     ).toHaveLength(0)

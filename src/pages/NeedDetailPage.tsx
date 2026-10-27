@@ -19,6 +19,7 @@ export default function NeedDetailPage({
   onBack: () => void
 }) {
   const [contributionSent, setContributionSent] = useState(false)
+  const isProposed = need.status === "proposed"
 
   return (
     <main className="min-h-[100dvh] w-full bg-[#f6f3ea] px-3 pb-16 pt-4 sm:px-6 sm:pt-7 lg:px-10 lg:pb-20">
@@ -58,13 +59,24 @@ export default function NeedDetailPage({
           </div>
         </header>
 
+        {isProposed && (
+          <p
+            className={`${reg} mt-4 rounded-xl bg-[#f0cb82]/40 px-4 py-3 text-[12px] leading-[1.5] text-[#555555]`}
+            role="note"
+          >
+            Propuesta inferida de la matriz; el equipo debe confirmar su
+            disponibilidad y alcance. Expresar interés aquí no envía una
+            solicitud al equipo.
+          </p>
+        )}
+
         <div className="mt-8 grid gap-9 lg:grid-cols-[1.25fr_0.75fr] lg:items-start lg:gap-10">
           <div className="space-y-10">
             <section>
               <p
                 className={`${semi} text-[10px] uppercase tracking-[0.16em] text-[#d9533f]`}
               >
-                Solicitud
+                {isProposed ? "Propuesta inferida" : "Solicitud"}
               </p>
               <h2 className={`${semi} mt-2 text-[22px] text-[#171827]`}>
                 Herramientas
@@ -179,14 +191,20 @@ export default function NeedDetailPage({
                     : "bg-[#d9533f] text-[#171827] hover:bg-[#e5634d] active:scale-[0.99]"
                 }`}
               >
-                {contributionSent ? "SOLICITUD ENVIADA" : "APORTAR"}
+                {contributionSent
+                  ? "INTERÉS REGISTRADO"
+                  : isProposed
+                    ? "EXPRESAR INTERÉS"
+                    : "APORTAR"}
               </button>
               {contributionSent && (
                 <p
                   className={`${reg} mt-3 text-center text-[11px] text-[#6b6a73]`}
                   role="status"
                 >
-                  El equipo recibió tu interés en esta colaboración.
+                  {isProposed
+                    ? "El interés quedó marcado en esta interfaz; el equipo aún debe validar la propuesta."
+                    : "El equipo recibió tu interés en esta colaboración."}
                 </p>
               )}
             </section>

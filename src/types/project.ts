@@ -15,6 +15,7 @@ export type Need = {
     name: string
     detail: string
   }
+  status?: "proposed"
   featured?: boolean
 }
 
