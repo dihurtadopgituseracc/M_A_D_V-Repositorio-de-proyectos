@@ -1,6 +1,7 @@
 import { projects } from "@/data/projects"
 
 import { reg, semi } from "@/constants/styles"
+import ScrollExpand from "@/components/common/ScrollExpand"
 
 export default function LandingPage({
   onOpenRepository,
@@ -9,13 +10,6 @@ export default function LandingPage({
   onOpenRepository: () => void
   onOpenGallery: () => void
 }) {
-  const openNeeds = projects.reduce(
-    (total, project) =>
-      total + project.needs.filter((need) => need.status !== "proposed").length,
-
-    0,
-  )
-
   return (
     <main className="min-h-[100dvh] bg-[#f6f3ea] text-[#171827]">
       <section className="bg-[#f0cb82] px-5 sm:px-8 lg:px-10">
@@ -27,24 +21,17 @@ export default function LandingPage({
               className="flex justify-center"
             >
               <img
-                src="/assets/images/LogoMADV.svg"
+                src={`${import.meta.env.BASE_URL}assets/branding/LogoMADV.svg`}
                 alt="MADV, repositorio de videojuegos"
                 width="140"
                 height="126"
                 className="block h-auto w-[290px] sm:w-[190px]"
               />
-            </a>
-            <span
-              className={`${semi} text-center text-[10px] uppercase text-[#363636]`}
-            >
-              Repositorio de videojuegos
-            </span>
+            </a>          
           </header>
 
           <div className="flex min-h-[560px] flex-col justify-center py-16 sm:min-h-[600px] sm:py-20">
-            <p className={`${semi} text-[11px] uppercase text-[#287b86]`}>
-              Proyectos · comunidad · videojuegos
-            </p>
+            
             <h1
               className={`${semi} mt-5 max-w-[900px] text-[42px] leading-[1.04] text-[#171827] sm:text-[56px]`}
             >
@@ -77,23 +64,33 @@ export default function LandingPage({
                 <span aria-hidden="true">↓</span>
               </button>
             </div>
-
-            <div className="mt-14 flex flex-wrap gap-x-10 gap-y-4 border-t border-[#363636]/20 pt-5">
-              <p className={`${reg} text-[40px] text-[#4f4e59]`}>
-                <span className={`${semi} mr-2 text-[#171827]`}>
-                  {String(projects.length).padStart(2, "0")}
-                </span>
-                proyectos abiertos
-              </p>
-              <p className={`${reg} text-[40px] text-[#4f4e59]`}>
-                <span className={`${semi} mr-2 text-[#171827]`}>
-                  {String(openNeeds).padStart(2, "0")}
-                </span>
-                oportunidades de colaboración
-              </p>
-            </div>
           </div>
         </div>
+      </section>
+
+      <section
+        className="bg-[#171827] px-5 sm:px-8 lg:px-10"
+        aria-label="Presentación visual de MADV"
+      >
+        <ScrollExpand
+          src={`${import.meta.env.BASE_URL}assets/branding/ScrollBG.jpg`}
+          alt="USERBG"
+          title="Baja para ver más"
+          scrollHint="Desplázate"
+          useWindowScroll
+        >
+          <h2
+            className={`${semi} max-w-[620px] text-[32px] text-white sm:text-[42px]`}
+          >
+            Cada proyecto, una oportunidad para aportar.
+          </h2>
+          <p
+            className={`${semi} mt-4 max-w-[560px] text-[20px] leading-[1.6] text-white/80 sm:text-[17px]`}
+          >
+            Encuentra proyectos y oportunidades para aportar en ellos en una
+             comunidad que desea crecer y fortalecer su pasión por el medio
+          </p>
+        </ScrollExpand>
       </section>
 
       <section

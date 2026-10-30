@@ -6,7 +6,7 @@ Aplicación web para explorar proyectos de videojuegos, revisar su avance y sus 
 
 ## Recorrido de ejecución
 
-1. `index.html` define el documento, el título actual de pestaña (`Repositorio abierto | MADV`) y carga `src/main.tsx` dentro de `#root`.
+1. `index.html` define el documento, el título actual de pestaña (`Proyectos abiertos | MADV`) y carga `src/main.tsx` dentro de `#root`.
 2. `src/main.tsx` importa los estilos globales y monta React.
 3. `src/App.tsx` es una fachada que reexporta `src/app/App.tsx`.
 4. `src/app/App.tsx` decide qué vista mostrar: landing, repositorio, detalle del proyecto o detalle de una solicitud.
@@ -24,21 +24,23 @@ Aplicación web para explorar proyectos de videojuegos, revisar su avance y sus 
 ├── vite.config.ts                # Vite, React, Tailwind, Figma Make y alias
 ├── vitest.config.ts              # Alias y configuración de pruebas
 ├── .mise.toml                    # Versiones de Node y pnpm
+├── .gitignore                    # Excluye dependencias, builds, secretos y estado local
 ├── AGENTS.md                     # Instrucciones de trabajo para agentes
 ├── CLAUDE.md                     # Reutiliza AGENTS.md
 ├── PROJECT_CONTEXT.md            # Este mapa de contexto mantenido
+├── dist/                         # Salida de `pnpm build` (generada, no versionada)
 ├── public/
 │   └── assets/
-│       ├── StewartCard.svg       # Arte conceptual usado por Stewart (recurso Git, sin LFS)
-│       ├── images/               # Imágenes compartidas; URL pública relativa a BASE_URL
-│       │   ├── LogoMADV.svg      # Logo de la landing
-│       ├── Titulo.svg            # Lámina de título para la galería
-│       ├── Contexto1.svg         # Lámina de contexto
-│       ├── Objetivos.svg         # Lámina de objetivos
-│       ├── Problemas.svg         # Lámina de problemas
-│       ├── Roadmap.svg           # Lámina de roadmap
-│       ├── Usuario.svg           # Lámina de usuario
-│       └── otros SVG             # Recursos visuales de las láminas
+│       ├── branding/
+│       │   └── LogoMADV.svg      # Logo de la landing
+│       ├── gallery/              # 12 láminas .svg del recorrido visual:
+│       │                         # Titulo, Contexto1, Contexto2, Objetivos,
+│       │                         # Problemas, Propuesta, Roadmap, Usuario,
+│       │                         # Entornos, EntornoEsp, ArbolProb, ArbustoProb
+│       └── projects/             # Arte conceptual de las tarjetas de proyecto
+│           ├── StewartCard.svg
+│           ├── BTWCard.svg
+│           └── BCCCard.svg
 └── src/
     ├── main.tsx                  # Montaje de React e importación de CSS
     ├── App.tsx                   # Fachada hacia app/App.tsx
@@ -52,6 +54,9 @@ Aplicación web para explorar proyectos de videojuegos, revisar su avance y sus 
     ├── components/
     │   ├── common/
     │   │   ├── ArtPlaceholder.tsx # Arte conceptual decorativo con color por proyecto
+    │   │   ├── LandingPopup.tsx   # Capa inicial de presentación (preparada, aún sin montar)
+    │   │   ├── ScrollExpand.tsx   # Marco visual que se expande con el scroll de la landing
+    │   │   └── ScrollExpand.css  # Estilos del componente ScrollExpand
     │   │   ├── Progress.tsx       # Barra de avance accesible con relleno CSS
     │   │   ├── SocialIcon.tsx     # Iconos de contacto social
     │   │   ├── Tag.tsx            # Etiqueta visual reutilizable
@@ -60,6 +65,8 @@ Aplicación web para explorar proyectos de videojuegos, revisar su avance y sus 
     │   │   └── NeedCard.tsx       # Tarjeta interactiva de una solicitud
     │   └── projects/
     │       └── ProjectCard.tsx    # Tarjeta de proyecto en el repositorio
+    ├── component/
+    │   └── DepthCarousel.tsx      # Carrusel de profundidad reutilizado en la galería
     ├── constants/
     │   └── styles.ts             # Tokens TypeScript y clases tipográficas comunes
     ├── services/
@@ -73,7 +80,7 @@ Aplicación web para explorar proyectos de videojuegos, revisar su avance y sus 
     │   └── projects.ts           # Catálogo local de proyectos y contenido asociado
     ├── pages/
     │   ├── LandingPage.tsx      # Portada y resumen de MADV
-    │   ├── GalleryPage.tsx      # Galería de 12 imágenes y visor 16:9
+    │   ├── GalleryPage.tsx      # Carrusel de 12 imágenes, descripciones y visor 16:9
     │   ├── RepositoryPage.tsx    # Listado de proyectos
     │   ├── ProjectDetailPage.tsx # Detalle, avance, QR, herramientas y necesidades
     │   └── NeedDetailPage.tsx    # Detalle de una necesidad y contactos
@@ -85,11 +92,14 @@ Aplicación web para explorar proyectos de videojuegos, revisar su avance y sus 
 
 ## Navegación y vistas
 
-- `RepositoryPage` recorre `projects` y presenta una tarjeta por proyecto; cada tarjeta completa abre los detalles del proyecto y su botón de colaboración conserva el registro de clic. “Volver a MADV” regresa a la portada y elimina `vista=repository` de la URL.
+- `RepositoryPage` recorre `projects` y presenta una tarjeta por proyecto; cada tarjeta completa abre los detalles del proyecto y su botón de colaboración conserva el registro de clic. Su identidad visual usa verdes eléctricos para diferenciar el catálogo de proyectos de la identidad amarilla de MADV. El encabezado comunica que son proyectos abiertos a colaboración (“Encuentra dónde aportar”) sin cambiar la navegación. “Volver a MADV” regresa a la portada y elimina `vista=repository` de la URL.
 - La raíz (`/`) muestra `LandingPage`. El CTA “Repositorio abierto” navega a `?vista=repository`; “Saber más del proyecto” abre `?vista=gallery`.
-- `GalleryPage` presenta `Titulo.svg`, `Contexto1.svg`, `Objetivos.svg`, `Problemas.svg`, `Roadmap.svg`, `Usuario.svg`, `Contexto2.svg`, `Entornos.svg`, `EntornoEsp.svg`, `Propuesta.svg`, `ArbolProb.svg` y `ArbustoProb.svg` desde `public/assets/`, en una columna móvil, dos columnas en tablet y tres en escritorio. Al pulsar una se abre un visor 16:9 a pantalla completa con navegación, cierre y soporte de teclado; si un SVG no carga, se muestra su nombre como fallback.
-- La landing presenta cantidades calculadas del catálogo local y una lista breve de los proyectos existentes. No añade proyectos ni modifica el catálogo.
-- Los recursos visuales compartidos van en `public/assets/` y se referencian desde la web anteponiendo `import.meta.env.BASE_URL` a `assets/<archivo>` para respetar la base de despliegue. El logo de MADV se encuentra en `public/assets/images/LogoMADV.svg` y se usa en el encabezado de la landing. Las láminas de la galería se encuentran en la raíz de assets.
+- `GalleryPage` presenta `Titulo.svg`, `Contexto1.svg`, `Objetivos.svg`, `Problemas.svg`, `Roadmap.svg`, `Usuario.svg`, `Contexto2.svg`, `Entornos.svg`, `EntornoEsp.svg`, `Propuesta.svg`, `ArbolProb.svg` y `ArbustoProb.svg` desde `public/assets/gallery/` mediante `DepthCarousel`, sobre un fondo oscuro igual al carrusel y con tipografía clara. La descripción inferior cambia con la lámina activa y al tocar una tarjeta se abre el visor 16:9 a pantalla completa, con navegación, cierre y soporte de teclado; si un SVG no carga, se muestra su nombre como fallback.
+- La landing presenta una lista breve de los proyectos existentes. Los contadores de proyectos y oportunidades se muestran en `RepositoryPage`, junto con el encabezado del catálogo. No añade proyectos ni modifica el catálogo.
+- `LandingPopup` encapsula la futura capa inicial de presentación: usa `PopUp.svg` cuando ese recurso esté disponible, aparece una vez por sesión, escucha el primer toque/clic o Escape, activa un desvanecimiento de 450 ms y luego se desmonta. El componente aún no está montado en `LandingPage` y `public/assets/branding/PopUp.svg` todavía no existe; al agregarlos, la landing se mantiene debajo de la capa sin cambiar la navegación.
+- La navegación entre landing, galería, repositorio, proyectos y necesidades cambia las vistas de forma instantánea, sin swipe ni slide horizontal.
+- `LandingPage` incluye `ScrollExpand` con `LogoMADV.jpg` como recurso visual. La animación usa el scroll de la ventana para expandir el marco, revelar el contenido y mantener la navegación existente sin dependencias externas.
+- Los recursos visuales se organizan en `public/assets/branding/`, `public/assets/gallery/` y `public/assets/projects/`. Se referencian desde la web anteponiendo `import.meta.env.BASE_URL` a `assets/<grupo>/<archivo>` para respetar la base de despliegue. El logo de MADV se encuentra en `public/assets/branding/LogoMADV.svg` y `LogoMADV.jpg`; las 12 láminas están en `gallery/` y el arte de tarjetas en `projects/`. Los archivos conservan sus nombres originales.
 - `repository_view` se registra al entrar al listado, no al visitar la landing. `trackCurrentPageView` distingue el listado mediante `vista=repository`.
 - Al seleccionar un proyecto, `app/App.tsx` actualiza el estado y agrega su ID a la query string: `?proyecto=<id>`.
 - `proyecto=<id>` tiene prioridad sobre `vista`; por ello los enlaces directos y QR existentes continúan abriendo la ficha del proyecto.
@@ -195,7 +205,7 @@ Errores previstos: `400` ID mal formado, `404` proyecto inexistente y `429` lím
 
 `src/data/projects.ts` contiene actualmente a Stewart, Frecuencia Cero, Beat The World y Beast Card Clash. El primer registro conserva deliberadamente el ID estable `ecos-de-umbra` para mantener los enlaces y QR ya emitidos; el siguiente reemplazo del ID requiere una migración explícita para no mezclar analítica ni romper enlaces.
 
-Stewart usa el arte conceptual `public/assets/StewartCard.svg`, con una URL formada desde `import.meta.env.BASE_URL` para funcionar también en despliegues bajo una subruta. El SVG se versiona directamente en Git para evitar la dependencia de Git LFS que tenía la imagen PNG anterior. El GDD describe un ARPG de aventura, fantasía ligera y comedia, con siete reinos inspirados en Colombia, exploración top-down, combate lateral y un sistema de empatía. El equipo activo y el progreso no están confirmados; por eso `team` y `progress` son `null`. Las necesidades y contactos permanecen vacíos hasta que el equipo confirme oportunidades reales.
+Stewart usa el arte conceptual `public/assets/projects/StewartCard.svg`, con una URL formada desde `import.meta.env.BASE_URL` para funcionar también en despliegues bajo una subruta. El SVG se versiona directamente en Git para evitar la dependencia de Git LFS que tenía la imagen PNG anterior. El GDD describe un ARPG de aventura, fantasía ligera y comedia, con siete reinos inspirados en Colombia, exploración top-down, combate lateral y un sistema de empatía. El equipo activo y el progreso no están confirmados; por eso `team` y `progress` aceptan `null`. Las necesidades y contactos permanecen vacíos hasta que el equipo confirme oportunidades reales.
 
 Beat The World se incorporó desde `Beat_The_World_matriz_repositorio.xlsx`. Su ficha sigue el formato conciso de Frecuencia Cero: resumen, etapa y estado, género, avance, herramientas, etiquetas y colaboraciones. El GDD no declara solicitudes de colaboración; las dos ideas de apoyo derivadas de gameplay y del analizador musical se marcan `proposed` y requieren validación, no son vacantes abiertas.
 
@@ -211,10 +221,11 @@ Beast Card Clash se incorporó desde `Beast_Card_Clash_matriz_repositorio.xlsx` 
 
 ## Configuración y herramientas
 
-- `vite.config.ts` configura React, Tailwind v4, plugins de Figma Make, el alias `@` hacia `src`, y el servidor de desarrollo. El puerto predeterminado es `8443`, configurable con `PORT`.
+- `vite.config.ts` configura React, Tailwind v4, plugins de Figma Make, el alias `@` hacia `src`, y el servidor de desarrollo. El puerto predeterminado es `8443`, configurable con `PORT`. `base` usa `FIGMA_PUBLIC_URL` cuando existe y `/` en caso contrario.
 - `.figma/make/site.json` configura metadatos de Figma Make, incluyendo descripción y directivas de indexación. El título visible actual está escrito directamente en `index.html`.
 - `tsconfig.json` activa TypeScript estricto y mapea `@/*` a `src/*`.
 - `.mise.toml` declara Node 22 y pnpm 10.34.3.
+- `oxfmt` es el formateador único del proyecto (`pnpm format`). Normaliza comillas dobles, sin punto y coma, y líneas largas en `src/` y en los archivos de configuración de la raíz.
 
 ## Comandos
 
@@ -236,6 +247,18 @@ pnpm format            # Formato con oxfmt
 ```
 
 La suite cubre modo local, IDs válidos e inválidos, necesidad asociada al proyecto correcto, categorías, timestamp, propiedades extra, fallos HTTP/red, endpoint y payload del adaptador, valores de entorno seguros, vistas iniciales/directas, clics de colaborar/aportar/contacto, enlaces intactos, separación por proyecto y renders en `StrictMode`. La integración real del backend, su rate limiting, su persistencia y el endpoint GET quedan pendientes porque no hay servidor en este repositorio.
+
+## Despliegue
+
+El sitio es una SPA estática: `pnpm build` genera `dist/` y no necesita servidor propio ni backend.
+
+- Host recomendado: Vercel, plan gratuito. Detecta Vite automáticamente.
+- Configuración de build: comando `pnpm build`, directorio de salida `dist`.
+- Publicación desde la carpeta local sin repositorio: `pnpm dlx vercel --prod` (requiere sesión) o `pnpm dlx vercel deploy --temporary --yes` para una URL anónima que expira en 60 minutos y puede reclamarse.
+- Publicación continua: conectar el repositorio de GitHub al proyecto de Vercel; cada envío a la rama principal actualiza producción y cada rama o PR genera una vista previa.
+- Rutas: la navegación usa query strings (`?vista=repository`, `?vista=gallery`, `?proyecto=<id>`), por lo que no se requiere reescritura de rutas en el host.
+- Variables: `VITE_ANALYTICS_MODE` y `VITE_API_BASE_URL` se configuran en el panel del host, nunca en el repositorio. Sin ellas, la analítica queda en modo local.
+- `.vercel` está excluido por `.gitignore`; `dist/` y `node_modules/` tampoco se versionan.
 
 ## Mantenimiento de este documento
 

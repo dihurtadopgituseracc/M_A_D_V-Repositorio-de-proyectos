@@ -1,67 +1,83 @@
 import { useEffect, useState } from "react"
 
 import { reg, semi } from "@/constants/styles"
+import DepthCarousel from "@/component/DepthCarousel"
+
+const galleryAssetUrl = (fileName: string) =>
+  `${import.meta.env.BASE_URL}assets/gallery/${fileName}`
 
 const galleryItems = [
   {
     number: "01",
-    src: `${import.meta.env.BASE_URL}assets/Titulo.svg`,
+    src: galleryAssetUrl("Titulo.svg"),
     alt: "Título y portada de MADV",
+    description: "La portada presenta MADV como un punto de encuentro para proyectos de videojuegos.",
   },
   {
     number: "02",
-    src: `${import.meta.env.BASE_URL}assets/Contexto1.svg`,
+    src: galleryAssetUrl("Contexto1.svg"),
     alt: "Contexto del proyecto MADV",
+    description: "El contexto explica la necesidad de conectar proyectos con personas dispuestas a colaborar.",
   },
   {
     number: "03",
-    src: `${import.meta.env.BASE_URL}assets/Objetivos.svg`,
+    src: galleryAssetUrl("Objetivos.svg"),
     alt: "Objetivos del proyecto MADV",
+    description: "Los objetivos definen cómo MADV facilita el descubrimiento y la colaboración entre equipos.",
   },
   {
     number: "04",
-    src: `${import.meta.env.BASE_URL}assets/Problemas.svg`,
+    src: galleryAssetUrl("Problemas.svg"),
     alt: "Problemas que aborda MADV",
+    description: "La propuesta responde a las dificultades para encontrar apoyo, visibilidad y recursos.",
   },
   {
     number: "05",
-    src: `${import.meta.env.BASE_URL}assets/Roadmap.svg`,
+    src: galleryAssetUrl("Roadmap.svg"),
     alt: "Roadmap del proyecto MADV",
+    description: "El roadmap resume las etapas previstas para hacer crecer la plataforma y su comunidad.",
   },
   {
     number: "06",
-    src: `${import.meta.env.BASE_URL}assets/Usuario.svg`,
+    src: galleryAssetUrl("Usuario.svg"),
     alt: "Perfil de usuario de MADV",
+    description: "El perfil de usuario muestra a las personas que buscan descubrir proyectos y aportar sus habilidades.",
   },
   {
     number: "07",
-    src: `${import.meta.env.BASE_URL}assets/Contexto2.svg`,
+    src: galleryAssetUrl("Contexto2.svg"),
     alt: "Continuación del contexto del proyecto MADV",
+    description: "Esta segunda parte amplía el contexto y las oportunidades que existen alrededor de los proyectos.",
   },
   {
     number: "08",
-    src: `${import.meta.env.BASE_URL}assets/Entornos.svg`,
+    src: galleryAssetUrl("Entornos.svg"),
     alt: "Entornos del proyecto Stewart",
+    description: "La exploración de entornos muestra referencias visuales del proyecto Stewart.",
   },
   {
     number: "09",
-    src: `${import.meta.env.BASE_URL}assets/EntornoEsp.svg`,
+    src: galleryAssetUrl("EntornoEsp.svg"),
     alt: "Entorno especial del proyecto Stewart",
+    description: "Un acercamiento a la ambientación y al entorno especial planteado para Stewart.",
   },
   {
     number: "10",
-    src: `${import.meta.env.BASE_URL}assets/Propuesta.svg`,
+    src: galleryAssetUrl("Propuesta.svg"),
     alt: "Propuesta del proyecto MADV",
+    description: "La propuesta reúne la solución visual y funcional para organizar proyectos abiertos.",
   },
   {
     number: "11",
-    src: `${import.meta.env.BASE_URL}assets/ArbolProb.svg`,
+    src: galleryAssetUrl("ArbolProb.svg"),
     alt: "Árbol con problema del proyecto Stewart",
+    description: "El árbol de problemas ordena las causas y consecuencias que afectan al proyecto Stewart.",
   },
   {
     number: "12",
-    src: `${import.meta.env.BASE_URL}assets/ArbustoProb.svg`,
+    src: galleryAssetUrl("ArbustoProb.svg"),
     alt: "Arbusto con problema del proyecto Stewart",
+    description: "El arbusto de problemas desglosa situaciones concretas que la propuesta busca atender.",
   },
 ]
 
@@ -91,7 +107,7 @@ function GalleryImage({
           No se pudo cargar {item.src.split("/").at(-1)}
         </span>
         <span className={`${reg} text-[10px] text-white/45`}>
-          public/assets/
+          public/assets/gallery/
         </span>
       </div>
       <img
@@ -108,6 +124,7 @@ function GalleryImage({
 }
 
 export default function GalleryPage({ onBack }: { onBack: () => void }) {
+  const [carouselIndex, setCarouselIndex] = useState(0)
   const [activeIndex, setActiveIndex] = useState<number | null>(null)
 
   const activeItem = activeIndex === null ? null : galleryItems[activeIndex]!
@@ -147,58 +164,62 @@ export default function GalleryPage({ onBack }: { onBack: () => void }) {
   }, [activeIndex])
 
   return (
-    <main className="min-h-[100dvh] bg-[#f6f3ea] px-5 pb-16 pt-5 text-[#171827] sm:px-8 sm:pt-8 lg:px-10">
+    <main className="min-h-[100dvh] bg-[#171827] px-5 pb-16 pt-5 text-white sm:px-8 sm:pt-8 lg:px-10">
       <div className="mx-auto max-w-[1120px]">
-        <header className="flex items-center justify-between gap-4 border-b border-[#171827]/15 pb-5">
+        <header className="flex items-center justify-between gap-4 border-b border-white/15 pb-5">
           <button
             type="button"
             onClick={onBack}
-            className={`${semi} inline-flex min-h-10 items-center gap-2 text-[12px] text-[#171827] hover:text-[#287b86] focus-visible:outline-2 focus-visible:outline-offset-2`}
+            className={`${semi} inline-flex min-h-10 items-center gap-2 text-[12px] text-white hover:text-[#f0cb82] focus-visible:outline-2 focus-visible:outline-offset-2`}
           >
             <span aria-hidden="true">←</span>
             Volver a MADV
           </button>
-          <span className={`${semi} text-[11px] text-[#171827]`}>MADV</span>
+          <span className={`${semi} text-[11px] text-white`}>MADV</span>
         </header>
 
         <section className="pt-10 sm:pt-14">
-          <p className={`${semi} text-[10px] uppercase text-[#d9533f]`}>
+          <p className={`${semi} text-[10px] uppercase text-white/65`}>
             Sobre el proyecto
           </p>
           <h1
-            className={`${semi} mt-2 text-[32px] leading-tight text-[#171827] sm:text-[42px]`}
+            className={`${semi} mt-2 text-[32px] leading-tight text-white sm:text-[42px]`}
           >
             Imágenes de MADV
           </h1>
           <p
-            className={`${reg} mt-3 max-w-[620px] text-[13px] leading-relaxed text-[#4f4e59]`}
+            className={`${reg} mt-3 max-w-[620px] text-[13px] leading-relaxed text-white/70`}
           >
             Un recorrido visual por MADV y los proyectos que forman parte de su
-            comunidad. Explora las 12 imágenes para verlas en detalle.
+            comunidad. Desliza o usa las flechas para cambiar de lámina; toca
+            una para verla completa.
           </p>
 
-          <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5 lg:grid-cols-3">
-            {galleryItems.map((item, index) => (
-              <button
-                key={item.number}
-                type="button"
-                onClick={() => setActiveIndex(index)}
-                aria-label={`Abrir imagen ${item.number}`}
-                className="group overflow-hidden rounded-[6px] text-left focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#287b86]"
-              >
-                <GalleryImage item={item} />
-                <span className="flex items-center justify-between gap-2 border-b border-[#171827]/15 py-3">
-                  <span className={`${semi} text-[11px] text-[#171827]`}>
-                    MADV · {item.number}
-                  </span>
-                  <span
-                    className={`${reg} text-[10px] text-[#6b6a73] transition group-hover:text-[#287b86]`}
-                  >
-                    Ampliar ↗
-                  </span>
-                </span>
-              </button>
-            ))}
+          <div className="mt-8 overflow-hidden rounded-[10px] bg-[#171827] px-2 py-4 sm:px-6 sm:py-6">
+            <DepthCarousel
+              items={galleryItems.map((item) => ({
+                image: item.src,
+                alt: item.alt,
+              }))}
+              cardWidth={480}
+              cardHeight={270}
+              radius={6}
+              depth={180}
+              spread={72}
+              visibleCards={3}
+              showControls
+              showIndicators
+              onChange={setCarouselIndex}
+              onCardClick={setActiveIndex}
+            />
+          </div>
+          <div className="mt-5 border-b border-white/15 pb-6">
+            <p className={`${semi} text-[11px] text-white/65`}>
+              MADV · {galleryItems[carouselIndex]?.number}
+            </p>
+            <p className={`${reg} mt-2 max-w-[680px] text-[14px] leading-relaxed text-white/75`}>
+              {galleryItems[carouselIndex]?.description}
+            </p>
           </div>
         </section>
       </div>

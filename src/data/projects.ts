@@ -31,7 +31,7 @@ export const projects: Project[] = [
     ],
     accent: "#dca039",
     artLabel: "STEWART · ARTE CONCEPTUAL",
-    artImage: `${import.meta.env.BASE_URL}assets/StewartCard.svg`,
+    artImage: `${import.meta.env.BASE_URL}assets/projects/StewartCard.svg`,
   },
   {
     id: "frecuencia-cero",
@@ -235,7 +235,7 @@ export const projects: Project[] = [
     ],
     accent: "#d9533f",
     artLabel: "BEAT THE WORLD · ARTE CONCEPTUAL",
-    artImage: `${import.meta.env.BASE_URL}assets/BTWCard.svg`,
+    artImage: `${import.meta.env.BASE_URL}assets/projects/BTWCard.svg`,
   },
   {
     id: "beast-card-clash",
@@ -325,6 +325,6 @@ export const projects: Project[] = [
     ],
     accent: "#59836f",
     artLabel: "BEAST CARD CLASH · VELD BEARS",
-    artImage: `${import.meta.env.BASE_URL}assets/BCCCard.svg`,
+    artImage: `${import.meta.env.BASE_URL}assets/projects/BCCCard.svg`,
   },
 ]

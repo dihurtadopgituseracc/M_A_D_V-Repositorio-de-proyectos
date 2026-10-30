@@ -103,18 +103,18 @@ describe("analytics interface instrumentation", () => {
         image.getAttribute("src"),
       ),
     ).toEqual([
-      "/assets/Titulo.svg",
-      "/assets/Contexto1.svg",
-      "/assets/Objetivos.svg",
-      "/assets/Problemas.svg",
-      "/assets/Roadmap.svg",
-      "/assets/Usuario.svg",
-      "/assets/Contexto2.svg",
-      "/assets/Entornos.svg",
-      "/assets/EntornoEsp.svg",
-      "/assets/Propuesta.svg",
-      "/assets/ArbolProb.svg",
-      "/assets/ArbustoProb.svg",
+      "/assets/gallery/Titulo.svg",
+      "/assets/gallery/Contexto1.svg",
+      "/assets/gallery/Objetivos.svg",
+      "/assets/gallery/Problemas.svg",
+      "/assets/gallery/Roadmap.svg",
+      "/assets/gallery/Usuario.svg",
+      "/assets/gallery/Contexto2.svg",
+      "/assets/gallery/Entornos.svg",
+      "/assets/gallery/EntornoEsp.svg",
+      "/assets/gallery/Propuesta.svg",
+      "/assets/gallery/ArbolProb.svg",
+      "/assets/gallery/ArbustoProb.svg",
     ])
     await click(container.querySelector('button[aria-label="Abrir imagen 01"]'))
     expect(container.querySelector('[role="dialog"]')).not.toBeNull()
@@ -138,7 +138,7 @@ describe("analytics interface instrumentation", () => {
 
     expect(window.location.search).toBe("?vista=repository")
     expect(container.querySelector("h1")?.textContent).toBe(
-      "Proyectos que buscan colaboraciónes",
+      "Encuentra dónde aportar",
     )
     expect(localAnalyticsAdapter.getEvents()).toMatchObject([
       { event_name: "repository_view" },
@@ -150,7 +150,7 @@ describe("analytics interface instrumentation", () => {
     await renderApp("/?vista=repository")
 
     expect(container.querySelector("h1")?.textContent).toBe(
-      "Proyectos que buscan colaboraciónes",
+      "Encuentra dónde aportar",
     )
 
     await click(
@@ -290,7 +290,7 @@ describe("analytics interface instrumentation", () => {
       container
         .querySelector('img[alt="Arte conceptual de Stewart"]')
         ?.getAttribute("src"),
-    ).toBe("/assets/StewartCard.svg")
+    ).toBe("/assets/projects/StewartCard.svg")
     expect(container.textContent).toContain("2 integrantes")
     expect(container.textContent).toContain(
       "Oportunidad de colaboración por confirmar",

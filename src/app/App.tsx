@@ -125,8 +125,15 @@ export default function App() {
     scrollToTop()
   }
 
+  let page = (
+    <LandingPage
+      onOpenRepository={openRepository}
+      onOpenGallery={openGallery}
+    />
+  )
+
   if (selected && selectedNeed) {
-    return (
+    page = (
       <NeedDetailPage
         project={selected}
         need={selectedNeed.need}
@@ -134,28 +141,19 @@ export default function App() {
         onBack={backToProject}
       />
     )
-  }
-
-  if (selected) {
-    return (
+  } else if (selected) {
+    page = (
       <ProjectDetailPage
         project={selected}
         onBack={openRepository}
         onOpenNeed={openNeed}
       />
     )
+  } else if (repositoryOpen) {
+    page = <RepositoryPage onOpen={navigate} onBack={closeRepository} />
+  } else if (galleryOpen) {
+    page = <GalleryPage onBack={closeGallery} />
   }
 
-  if (repositoryOpen) {
-    return <RepositoryPage onOpen={navigate} onBack={closeRepository} />
-  }
-
-  if (galleryOpen) return <GalleryPage onBack={closeGallery} />
-
-  return (
-    <LandingPage
-      onOpenRepository={openRepository}
-      onOpenGallery={openGallery}
-    />
-  )
+  return page
 }
