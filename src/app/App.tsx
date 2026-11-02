@@ -4,6 +4,7 @@ import GalleryPage from "@/pages/GalleryPage"
 import RepositoryPage from "@/pages/RepositoryPage"
 import ProjectDetailPage from "@/pages/ProjectDetailPage"
 import NeedDetailPage from "@/pages/NeedDetailPage"
+import StaggeredMenu from "@/component/StaggeredMenu"
 import type { Need, Project } from "@/types/project"
 import { projects } from "@/data/projects"
 import { scrollToTop } from "@/utils/scroll"
@@ -155,5 +156,79 @@ export default function App() {
     page = <GalleryPage onBack={closeGallery} />
   }
 
-  return page
+  const backAction = selectedNeed
+    ? backToProject
+    : selected
+      ? openRepository
+      : repositoryOpen
+        ? closeRepository
+        : galleryOpen
+          ? closeGallery
+          : null
+  const backLabel = selectedNeed
+    ? "Resumen del proyecto"
+    : selected
+      ? "Proyectos"
+      : "Volver a MADV"
+  const navBackgroundColor = galleryOpen
+    ? "#171827"
+    : repositoryOpen
+      ? "#b7ff3c"
+      : selected || selectedNeed
+        ? "#f6f3ea"
+        : "#f0cb82"
+  const navTextColor = galleryOpen ? "#ffffff" : "#171827"
+
+  return (
+    <>
+      <StaggeredMenu
+        position="right"
+        menuButtonColor={navTextColor}
+        openMenuButtonColor="#171827"
+        headerColor={navBackgroundColor}
+        backButtonColor={navTextColor}
+        accentColor="#38c528"
+        colors={["#f0cb82", "#18d66d", "#171827"]}
+        leadingContent={
+          backAction ? (
+            <button
+              type="button"
+              onClick={backAction}
+              aria-label={backLabel}
+              className="sm-back-button"
+            >
+              <span aria-hidden="true">←</span>
+              <span className="sr-only">{backLabel}</span>
+            </button>
+          ) : (
+            <span aria-hidden="true" />
+          )
+        }
+        items={[
+          {
+            label: "Inicio",
+            ariaLabel: "Ir a la página de inicio",
+            link: "./",
+          },
+          {
+            label: "Proyectos",
+            ariaLabel: "Ver proyectos abiertos",
+            link: "./?vista=repository",
+          },
+          {
+            label: "Sobre MADV",
+            ariaLabel: "Conocer más sobre MADV",
+            link: "./?vista=gallery",
+          },
+        ]}
+        socialItems={[
+          {
+            label: "Instagram",
+            link: "https://www.instagram.com/gdd_col/",
+          },
+        ]}
+      />
+      {page}
+    </>
+  )
 }

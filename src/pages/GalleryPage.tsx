@@ -11,73 +11,85 @@ const galleryItems = [
     number: "01",
     src: galleryAssetUrl("Titulo.svg"),
     alt: "Título y portada de MADV",
-    description: "La portada presenta MADV como un punto de encuentro para proyectos de videojuegos.",
+    description:
+      "La portada presenta MADV como un punto de encuentro para proyectos de videojuegos.",
   },
   {
     number: "02",
     src: galleryAssetUrl("Contexto1.svg"),
     alt: "Contexto del proyecto MADV",
-    description: "El contexto explica la necesidad de conectar proyectos con personas dispuestas a colaborar.",
+    description:
+      "El contexto explica la necesidad de conectar proyectos con personas dispuestas a colaborar.",
   },
   {
     number: "03",
     src: galleryAssetUrl("Objetivos.svg"),
     alt: "Objetivos del proyecto MADV",
-    description: "Los objetivos definen cómo MADV facilita el descubrimiento y la colaboración entre equipos.",
+    description:
+      "Los objetivos definen cómo MADV facilita el descubrimiento y la colaboración entre equipos.",
   },
   {
     number: "04",
     src: galleryAssetUrl("Problemas.svg"),
     alt: "Problemas que aborda MADV",
-    description: "La propuesta responde a las dificultades para encontrar apoyo, visibilidad y recursos.",
+    description:
+      "La propuesta responde a las dificultades para encontrar apoyo, visibilidad y recursos.",
   },
   {
     number: "05",
     src: galleryAssetUrl("Roadmap.svg"),
     alt: "Roadmap del proyecto MADV",
-    description: "El roadmap resume las etapas previstas para hacer crecer la plataforma y su comunidad.",
+    description:
+      "El roadmap resume las etapas previstas para hacer crecer la plataforma y su comunidad.",
   },
   {
     number: "06",
     src: galleryAssetUrl("Usuario.svg"),
     alt: "Perfil de usuario de MADV",
-    description: "El perfil de usuario muestra a las personas que buscan descubrir proyectos y aportar sus habilidades.",
+    description:
+      "El perfil de usuario muestra a las personas que buscan descubrir proyectos y aportar sus habilidades.",
   },
   {
     number: "07",
     src: galleryAssetUrl("Contexto2.svg"),
     alt: "Continuación del contexto del proyecto MADV",
-    description: "Esta segunda parte amplía el contexto y las oportunidades que existen alrededor de los proyectos.",
+    description:
+      "Esta segunda parte amplía el contexto y las oportunidades que existen alrededor de los proyectos.",
   },
   {
     number: "08",
     src: galleryAssetUrl("Entornos.svg"),
     alt: "Entornos del proyecto Stewart",
-    description: "La exploración de entornos muestra referencias visuales del proyecto Stewart.",
+    description:
+      "La exploración de entornos muestra referencias visuales del proyecto Stewart.",
   },
   {
     number: "09",
     src: galleryAssetUrl("EntornoEsp.svg"),
     alt: "Entorno especial del proyecto Stewart",
-    description: "Un acercamiento a la ambientación y al entorno especial planteado para Stewart.",
+    description:
+      "Un acercamiento a la ambientación y al entorno especial planteado para Stewart.",
   },
   {
     number: "10",
     src: galleryAssetUrl("Propuesta.svg"),
     alt: "Propuesta del proyecto MADV",
-    description: "La propuesta reúne la solución visual y funcional para organizar proyectos abiertos.",
+    description:
+      "La propuesta reúne la solución visual y funcional para organizar proyectos abiertos.",
   },
   {
     number: "11",
     src: galleryAssetUrl("ArbolProb.svg"),
     alt: "Árbol con problema del proyecto Stewart",
-    description: "El árbol de problemas ordena las causas y consecuencias que afectan al proyecto Stewart.",
+    description:
+      "El árbol de problemas ordena las causas y consecuencias que afectan al proyecto Stewart.",
   },
   {
     number: "12",
     src: galleryAssetUrl("ArbustoProb.svg"),
     alt: "Arbusto con problema del proyecto Stewart",
-    description: "El arbusto de problemas desglosa situaciones concretas que la propuesta busca atender.",
+    description:
+      "El arbusto de problemas desglosa situaciones concretas que la propuesta busca atender.",
   },
 ]
 
@@ -166,18 +178,6 @@ export default function GalleryPage({ onBack }: { onBack: () => void }) {
   return (
     <main className="min-h-[100dvh] bg-[#171827] px-5 pb-16 pt-5 text-white sm:px-8 sm:pt-8 lg:px-10">
       <div className="mx-auto max-w-[1120px]">
-        <header className="flex items-center justify-between gap-4 border-b border-white/15 pb-5">
-          <button
-            type="button"
-            onClick={onBack}
-            className={`${semi} inline-flex min-h-10 items-center gap-2 text-[12px] text-white hover:text-[#f0cb82] focus-visible:outline-2 focus-visible:outline-offset-2`}
-          >
-            <span aria-hidden="true">←</span>
-            Volver a MADV
-          </button>
-          <span className={`${semi} text-[11px] text-white`}>MADV</span>
-        </header>
-
         <section className="pt-10 sm:pt-14">
           <p className={`${semi} text-[10px] uppercase text-white/65`}>
             Sobre el proyecto
@@ -217,7 +217,9 @@ export default function GalleryPage({ onBack }: { onBack: () => void }) {
             <p className={`${semi} text-[11px] text-white/65`}>
               MADV · {galleryItems[carouselIndex]?.number}
             </p>
-            <p className={`${reg} mt-2 max-w-[680px] text-[14px] leading-relaxed text-white/75`}>
+            <p
+              className={`${reg} mt-2 max-w-[680px] text-[14px] leading-relaxed text-white/75`}
+            >
               {galleryItems[carouselIndex]?.description}
             </p>
           </div>

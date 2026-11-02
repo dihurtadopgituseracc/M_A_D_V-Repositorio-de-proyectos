@@ -139,16 +139,6 @@ export default function ProjectDetailPage({
   return (
     <main className="min-h-[100dvh] w-full bg-[#f6f3ea] px-3 pb-16 pt-4 sm:px-6 sm:pt-7 lg:px-10 lg:pb-20">
       <div className="mx-auto max-w-[1120px]">
-        <button
-          onClick={onBack}
-          className={`${semi} group inline-flex min-h-10 items-center gap-2 rounded-full pr-4 text-[14px] text-[#171827] transition hover:bg-white hover:text-[#287b86] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#287b86]`}
-        >
-          <span className="grid size-8 place-items-center rounded-full bg-white text-[20px] shadow-sm transition group-hover:-translate-x-0.5">
-            ‹
-          </span>
-          Proyectos
-        </button>
-
         <div className="mt-3 flex flex-col justify-between gap-3 border-b border-[#171827]/10 pb-5 sm:flex-row sm:items-end">
           <div>
             <p

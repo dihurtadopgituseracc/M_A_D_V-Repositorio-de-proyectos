@@ -17,6 +17,10 @@
 *.ai                 filter=lfs diff=lfs merge=lfs -text
 *.sketch             filter=lfs diff=lfs merge=lfs -text
 
+# Public branding images are served directly by Vercel and must not depend on
+# Git LFS materialization during deployment.
+public/assets/branding/*.jpg -filter -diff -merge
+
 # ---------------------------------------------------------------------------
 # Video
 # ---------------------------------------------------------------------------

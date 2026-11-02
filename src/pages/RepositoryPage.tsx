@@ -19,19 +19,6 @@ export default function RepositoryPage({
     <main className="min-h-[100dvh] w-full bg-[#eff8ee] px-3 pb-14 pt-8 sm:px-6 sm:pt-12 lg:px-10 lg:pb-20">
       <header className="-mx-3 -mt-8 mb-7 bg-[#b7ff3c] px-3 pb-6 pt-8 sm:-mx-6 sm:-mt-12 sm:mb-10 sm:px-6 sm:pt-12 lg:-mx-10 lg:px-10">
         <div className="mx-auto max-w-[1120px]">
-          <div className="mb-5 flex items-center justify-between gap-4 border-b border-[#363636]/15 pb-4">
-            <button
-              type="button"
-              onClick={onBack}
-              className={`${semi} inline-flex min-h-10 items-center gap-2 text-[12px] text-[#10261c] hover:text-[#126b43] focus-visible:outline-2 focus-visible:outline-offset-2`}
-            >
-              <span aria-hidden="true">←</span>
-              Volver a MADV
-            </button>
-            <span className={`${semi} text-[11px] text-[#10261c]`}>
-              PROYECTOS
-            </span>
-          </div>
           <div className="flex flex-col justify-between gap-5 border-b border-[#10261c]/20 pb-6 sm:flex-row sm:items-end">
             <div>
               <p

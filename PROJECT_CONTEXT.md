@@ -11,6 +11,7 @@ Aplicación web para explorar proyectos de videojuegos, revisar su avance y sus 
 3. `src/App.tsx` es una fachada que reexporta `src/app/App.tsx`.
 4. `src/app/App.tsx` decide qué vista mostrar: landing, repositorio, detalle del proyecto o detalle de una solicitud.
 5. `src/data/projects.ts` proporciona los datos que consumen las vistas y componentes.
+6. `src/component/StaggeredMenu.tsx` presenta la navegación global fija y el enlace de Instagram de GDD en todas las vistas.
 
 ## Estructura
 
@@ -28,6 +29,7 @@ Aplicación web para explorar proyectos de videojuegos, revisar su avance y sus 
 ├── AGENTS.md                     # Instrucciones de trabajo para agentes
 ├── CLAUDE.md                     # Reutiliza AGENTS.md
 ├── PROJECT_CONTEXT.md            # Este mapa de contexto mantenido
+├── plantilla_proyecto_repositorio.xlsx # Plantilla vacía para incorporar nuevos proyectos
 ├── dist/                         # Salida de `pnpm build` (generada, no versionada)
 ├── public/
 │   └── assets/
@@ -92,10 +94,14 @@ Aplicación web para explorar proyectos de videojuegos, revisar su avance y sus 
 
 ## Navegación y vistas
 
-- `RepositoryPage` recorre `projects` y presenta una tarjeta por proyecto; cada tarjeta completa abre los detalles del proyecto y su botón de colaboración conserva el registro de clic. Su identidad visual usa verdes eléctricos para diferenciar el catálogo de proyectos de la identidad amarilla de MADV. El encabezado comunica que son proyectos abiertos a colaboración (“Encuentra dónde aportar”) sin cambiar la navegación. “Volver a MADV” regresa a la portada y elimina `vista=repository` de la URL.
-- La raíz (`/`) muestra `LandingPage`. El CTA “Repositorio abierto” navega a `?vista=repository`; “Saber más del proyecto” abre `?vista=gallery`.
+- `RepositoryPage` recorre `projects` y presenta una tarjeta por proyecto; cada tarjeta completa abre los detalles del proyecto y su botón de colaboración conserva el registro de clic. `ProjectCard` muestra las herramientas y las etiquetas con sus respectivos rótulos. Su identidad visual usa verdes eléctricos para diferenciar el catálogo de proyectos de la identidad amarilla de MADV. El encabezado comunica que son proyectos abiertos a colaboración (“Encuentra dónde aportar”) sin cambiar la navegación. “Volver a MADV” regresa a la portada y elimina `vista=repository` de la URL.
+- La raíz (`/`) muestra `LandingPage`; su logo principal es decorativo y no funciona como enlace. El CTA “Repositorio abierto” navega a `?vista=repository`; “Saber más del proyecto” abre `?vista=gallery`.
+- `StaggeredMenu` ocupa el encabezado superior de todas las vistas y enlaza a Inicio, Proyectos y Sobre MADV; el botón se desplaza con el contenido en lugar de permanecer fijo durante el scroll. También ofrece el Instagram de GDD (`@gdd_col`).
+- `App` compone una barra de navegación global única: la flecha accesible de regreso queda a la izquierda y `StaggeredMenu` a la derecha. Las vistas secundarias no renderizan barras o controles superiores duplicados.
+- La barra global recibe `headerColor` y `backButtonColor` según la vista activa para igualar el color de la sección inferior y mantener el contraste de “Menu +” y la flecha.
 - `GalleryPage` presenta `Titulo.svg`, `Contexto1.svg`, `Objetivos.svg`, `Problemas.svg`, `Roadmap.svg`, `Usuario.svg`, `Contexto2.svg`, `Entornos.svg`, `EntornoEsp.svg`, `Propuesta.svg`, `ArbolProb.svg` y `ArbustoProb.svg` desde `public/assets/gallery/` mediante `DepthCarousel`, sobre un fondo oscuro igual al carrusel y con tipografía clara. La descripción inferior cambia con la lámina activa y al tocar una tarjeta se abre el visor 16:9 a pantalla completa, con navegación, cierre y soporte de teclado; si un SVG no carga, se muestra su nombre como fallback.
-- La landing presenta una lista breve de los proyectos existentes. Los contadores de proyectos y oportunidades se muestran en `RepositoryPage`, junto con el encabezado del catálogo. No añade proyectos ni modifica el catálogo.
+- La landing presenta una introducción de MADV, una sección de preguntas frecuentes con desplegables nativos (`details`/`summary`) y una lista breve de los proyectos existentes. Los contadores de proyectos y oportunidades se muestran en `RepositoryPage`, junto con el encabezado del catálogo. No añade proyectos ni modifica el catálogo.
+- La sección “Qué implica el proyecto…” incluye un `HalftoneReveal` interactivo con `ScrollBG.jpg` y un subtítulo sobre el crecimiento de la comunidad.
 - `LandingPopup` encapsula la futura capa inicial de presentación: usa `PopUp.svg` cuando ese recurso esté disponible, aparece una vez por sesión, escucha el primer toque/clic o Escape, activa un desvanecimiento de 450 ms y luego se desmonta. El componente aún no está montado en `LandingPage` y `public/assets/branding/PopUp.svg` todavía no existe; al agregarlos, la landing se mantiene debajo de la capa sin cambiar la navegación.
 - La navegación entre landing, galería, repositorio, proyectos y necesidades cambia las vistas de forma instantánea, sin swipe ni slide horizontal.
 - `LandingPage` incluye `ScrollExpand` con `LogoMADV.jpg` como recurso visual. La animación usa el scroll de la ventana para expandir el marco, revelar el contenido y mantener la navegación existente sin dependencias externas.
@@ -109,6 +115,8 @@ Aplicación web para explorar proyectos de videojuegos, revisar su avance y sus 
 - Las necesidades tienen IDs canónicos en `src/data/projects.ts`, añadidos al modelo porque no existían antes. Los eventos usan esos IDs junto con el ID original del proyecto; no fabrican identificadores durante el registro.
 - `ProjectDetailPage` muestra el resumen y estado del proyecto, las herramientas, sus solicitudes y un QR generado en tiempo de ejecución con `qrcode.react` (`QRCodeSVG`). El QR apunta a la URL del proyecto y ofrece compartirlo como imagen mediante Web Share API cuando el navegador lo permite, o descargarlo como PNG.
 - `ProjectCard` y `ProjectDetailPage` muestran el arte opcional `Project.artImage`; si el equipo/progreso no está confirmado, `team` y `progress` aceptan `null` y la interfaz muestra “por confirmar” sin dibujar porcentajes ficticios.
+- `fuerza-paranormal` corresponde a “Luchador contra lo Oculto”, documentado en la matriz de Fuerza Paranormal. El catálogo registra un avance del 10%, etapa de producción, 3 integrantes, Unity/Blender/Google Drive/LMMS y un alcance de acción paranormal en PC; el proyecto no documenta solicitudes de colaboración, por lo que `needs`/`contacts` permanecen vacíos.
+- `plantilla_proyecto_repositorio.xlsx` es la plantilla de carga manual para nuevos proyectos. Sus hojas separan los datos generales, herramientas, etiquetas, necesidades, requisitos, entregables y contactos; las filas de datos se dejan vacías para completar cada nuevo proyecto.
 - Al seleccionar una solicitud, `NeedDetailPage` muestra sus requisitos, entregable y contactos. Esa selección es estado local y no tiene una URL propia.
 - Los botones para mostrar interés/aportar cambian el estado de la interfaz, pero no envían ni guardan información en un servidor.
 

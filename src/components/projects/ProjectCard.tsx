@@ -73,10 +73,13 @@ export default function ProjectCard({
               {project.tools.map((tool) => tool.detail).join(" · ")}
             </p>
           </div>
-          <div className="mt-4 flex flex-wrap gap-2">
-            {project.tags.map((tag) => (
-              <Tag key={tag}>{tag}</Tag>
-            ))}
+          <div className="mt-4">
+            <p className={`${semi} text-[15px] text-[#171827]`}>Etiquetas</p>
+            <div className="mt-2 flex flex-wrap gap-2">
+              {project.tags.map((tag) => (
+                <Tag key={tag}>{tag}</Tag>
+              ))}
+            </div>
           </div>
           <div className="mt-auto pt-5">
             <div className="flex min-h-[96px] items-center justify-between gap-4 rounded-[18px] bg-[#10261c] px-4 py-4">
