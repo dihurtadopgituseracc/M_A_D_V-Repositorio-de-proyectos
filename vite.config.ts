@@ -2,6 +2,20 @@ import { defineConfig, type HtmlTagDescriptor, type Plugin } from "vite"
 import react from "@vitejs/plugin-react"
 import tailwindcss from "@tailwindcss/vite"
 import path from "node:path"
+import { appendFile, mkdir, readFile } from "node:fs/promises"
+import type { IncomingMessage, ServerResponse } from "node:http"
+
+import type * as VisitsReportModule from "./src/services/analytics/visits-report"
+import type * as AnalyticsTypesModule from "./src/services/analytics/analytics.types"
+import type * as ProjectsModule from "./src/data/projects"
+import { instagramPostUrl } from "./src/data/instagram-post"
+import {
+  isAllowedInstagramImageUrl,
+  parseInstagramPostHtml,
+  parseInstagramPostUrl,
+  readMetaTags,
+  type InstagramPostResult,
+} from "./src/services/instagram/instagram-post"
 
 import siteConfiguration from "./.figma/make/site.json"
 
@@ -25,6 +39,8 @@ export default defineConfig(({ mode }) => {
       figmaErrorOverlayReplay(),
       figmaReactRefreshBoundaryFallback(),
       figmaMakeKitPlugin({ storiesGlob: "/src/**/*.stories.{ts,tsx,js,jsx}" }),
+      visitsDashboardPlugin(),
+      instagramPostPlugin(instagramPostUrl),
     ],
     resolve: {
       alias: {
@@ -36,7 +52,7 @@ export default defineConfig(({ mode }) => {
       port: parseInt(process.env.PORT || "8443"),
       strictPort: true,
       watch: {
-        ignored: ["**/.figma/**"],
+        ignored: ["**/.figma/**", "**/.data/**"],
       },
     },
     preview: {
@@ -409,6 +425,227 @@ function figmaMakeKitPlugin(options: {
           next(err as Error)
         }
       })
+    },
+  }
+}
+
+
+/**
+ * Registro de visitas mientras la página se sirve con el servidor de Vite.
+ *
+ * - `POST <base>api/events` valida el evento con `isAnalyticsEvent` y lo agrega
+ *   a `.data/visits.jsonl` junto con la hora de recepción del servidor.
+ * - `GET <base>dashboard-visitas` devuelve un HTML de texto plano con los conteos.
+ *
+ * Solo existe en `vite` (dev). El build estático desplegado no incluye estas rutas.
+ */
+function visitsDashboardPlugin(): Plugin {
+  const MAX_BODY_BYTES = 4096
+
+  function readBody(req: IncomingMessage): Promise<string | null> {
+    return new Promise((resolve, reject) => {
+      if (Number(req.headers["content-length"] ?? 0) > MAX_BODY_BYTES) {
+        req.resume()
+        resolve(null)
+        return
+      }
+
+      let size = 0
+      let tooLarge = false
+      const chunks: Buffer[] = []
+      req.on("data", (chunk: Buffer) => {
+        size += chunk.length
+        if (size > MAX_BODY_BYTES) tooLarge = true
+        if (!tooLarge) chunks.push(chunk)
+      })
+      req.on("end", () =>
+        resolve(tooLarge ? null : Buffer.concat(chunks).toString("utf8")),
+      )
+      req.on("error", reject)
+    })
+  }
+
+  function send(res: ServerResponse, status: number, body = "", type = "text/plain; charset=utf-8") {
+    res.statusCode = status
+    res.setHeader("Content-Type", type)
+    res.setHeader("Cache-Control", "no-store")
+    res.end(body)
+  }
+
+  return {
+    name: "madv-visits-dashboard",
+    apply: "serve",
+    configureServer(server) {
+      const dataFile = path.resolve(server.config.root, ".data", "visits.jsonl")
+
+      const loadModules = async () => ({
+        report: (await server.ssrLoadModule(
+          "/src/services/analytics/visits-report.ts",
+        )) as typeof VisitsReportModule,
+        types: (await server.ssrLoadModule(
+          "/src/services/analytics/analytics.types.ts",
+        )) as typeof AnalyticsTypesModule,
+        catalog: (await server.ssrLoadModule(
+          "/src/data/projects.ts",
+        )) as typeof ProjectsModule,
+      })
+
+      server.middlewares.use(async (req, res, next) => {
+        const pathname = (req.url ?? "").split("?")[0] ?? ""
+        const isEvents = pathname.endsWith("/api/events")
+        const isDashboard = /\/dashboard-visitas\/?$/.test(pathname)
+
+        if (!isEvents && !isDashboard) return next()
+
+        try {
+          if (isEvents) {
+            if (req.method !== "POST") {
+              res.setHeader("Allow", "POST")
+              return send(res, 405, "Method Not Allowed")
+            }
+
+            if (!req.headers["content-type"]?.startsWith("application/json")) {
+              return send(res, 415, "Unsupported Media Type")
+            }
+
+            const body = await readBody(req)
+            if (body === null) return send(res, 413, "Payload Too Large")
+
+            let payload: unknown
+            try {
+              payload = JSON.parse(body)
+            } catch {
+              return send(res, 400, "Invalid JSON")
+            }
+
+            const { report, types } = await loadModules()
+            if (!types.isAnalyticsEvent(payload)) {
+              return send(res, 422, "Invalid analytics event")
+            }
+
+            await mkdir(path.dirname(dataFile), { recursive: true })
+            await appendFile(dataFile, report.toStoredLine(payload, new Date()), "utf8")
+            return send(res, 202)
+          }
+
+          if (req.method !== "GET" && req.method !== "HEAD") {
+            res.setHeader("Allow", "GET, HEAD")
+            return send(res, 405, "Method Not Allowed")
+          }
+
+          const { report, catalog } = await loadModules()
+          let content = ""
+          try {
+            content = await readFile(dataFile, "utf8")
+          } catch (error) {
+            if ((error as NodeJS.ErrnoException).code !== "ENOENT") throw error
+          }
+
+          const { events, skippedLines } = report.parseStoredEvents(content)
+          const html = report.renderVisitsReportHtml(
+            report.buildVisitsReport(events, catalog.projects, skippedLines),
+          )
+          res.setHeader("X-Robots-Tag", "noindex, nofollow")
+          return send(res, 200, req.method === "HEAD" ? "" : html, "text/html; charset=utf-8")
+        } catch (error) {
+          server.config.logger.error(`[visits] ${(error as Error).message}`)
+          return send(res, 500, "Internal Server Error")
+        }
+      })
+    },
+  }
+}
+
+/**
+ * Publicación real de Instagram para la página de Eventos.
+ *
+ * Expone `virtual:instagram-post` con los datos del post de `src/data/instagram-post.ts`.
+ * Al arrancar `vite` o al ejecutar `vite build`, pide el enlace público con el user-agent de
+ * vista previa de enlaces (el mismo mecanismo que usan WhatsApp o Facebook para mostrar la
+ * tarjeta), lee las etiquetas og: y descarga la imagen y la foto de perfil como data URL.
+ * Así el navegador no hace peticiones a Instagram y el build estático funciona sin servidor.
+ * Si algo falla, el módulo exporta `status: "error"` y la compilación continúa.
+ */
+function instagramPostPlugin(rawUrl: string): Plugin {
+  const VIRTUAL_ID = "virtual:instagram-post"
+  const RESOLVED_ID = "\0" + VIRTUAL_ID
+  const PREVIEW_USER_AGENT =
+    "facebookexternalhit/1.1 (+http://www.facebook.com/externalhit_uatext.php)"
+  const TIMEOUT_MS = 10_000
+  const MAX_IMAGE_BYTES = 5 * 1024 * 1024
+  let cached: Promise<InstagramPostResult> | null = null
+
+  async function fetchText(url: string): Promise<string> {
+    const response = await fetch(url, {
+      headers: { "User-Agent": PREVIEW_USER_AGENT, "Accept-Language": "en-US,en;q=0.8" },
+      redirect: "follow",
+      signal: AbortSignal.timeout(TIMEOUT_MS),
+    })
+    if (!response.ok) throw new Error(`Instagram respondió HTTP ${response.status}`)
+    const finalHost = new URL(response.url).hostname
+    if (!finalHost.endsWith("instagram.com")) {
+      throw new Error(`Instagram redirigió a ${finalHost}`)
+    }
+    return response.text()
+  }
+
+  async function fetchImageAsDataUrl(url: string | null | undefined): Promise<string | null> {
+    if (!url || !isAllowedInstagramImageUrl(url)) return null
+    const response = await fetch(url, { signal: AbortSignal.timeout(TIMEOUT_MS) })
+    const type = response.headers.get("content-type") ?? ""
+    if (!response.ok || !/^image\/(jpeg|png|webp|gif)$/.test(type.split(";")[0]!.trim())) {
+      return null
+    }
+    const bytes = Buffer.from(await response.arrayBuffer())
+    if (bytes.length === 0 || bytes.length > MAX_IMAGE_BYTES) return null
+    return `data:${type.split(";")[0]!.trim()};base64,${bytes.toString("base64")}`
+  }
+
+  async function load(): Promise<InstagramPostResult> {
+    const url = rawUrl.trim()
+    if (!url) return { status: "empty" }
+
+    const parsedUrl = parseInstagramPostUrl(url)
+    if (!parsedUrl) {
+      return {
+        status: "error",
+        url: null,
+        message:
+          "El enlace no es un post público de Instagram (se espera https://www.instagram.com/p/<código>/).",
+      }
+    }
+
+    try {
+      const metadata = parseInstagramPostHtml(await fetchText(parsedUrl.canonicalUrl), parsedUrl)
+      if (!metadata) {
+        throw new Error("Instagram no devolvió los datos del post (¿es privado o fue borrado?)")
+      }
+
+      const image = await fetchImageAsDataUrl(metadata.imageUrl).catch(() => null)
+      const avatar = await fetchText(`https://www.instagram.com/${metadata.username}/`)
+        .then((html) => fetchImageAsDataUrl(readMetaTags(html).get("og:image")))
+        .catch(() => null)
+
+      const { imageUrl: _imageUrl, ...post } = metadata
+      return { status: "ok", post: { ...post, image, avatar: avatar ?? undefined } }
+    } catch (error) {
+      return { status: "error", url: parsedUrl.canonicalUrl, message: (error as Error).message }
+    }
+  }
+
+  return {
+    name: "madv-instagram-post",
+    resolveId(id) {
+      return id === VIRTUAL_ID ? RESOLVED_ID : null
+    },
+    async load(id) {
+      if (id !== RESOLVED_ID) return null
+      cached ??= load()
+      const result = await cached
+      if (result.status === "error") {
+        this.warn(`[instagram] ${result.message}`)
+      }
+      return `export default ${JSON.stringify(result)}`
     },
   }
 }

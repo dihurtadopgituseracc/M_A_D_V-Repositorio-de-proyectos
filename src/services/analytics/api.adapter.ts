@@ -14,7 +14,10 @@ export class ApiAnalyticsAdapter implements AnalyticsAdapter {
   constructor(
     apiBaseUrl: string,
 
-    private readonly fetchImplementation: typeof fetch = fetch,
+    // Envolver `fetch` evita "Illegal invocation": el navegador exige que se
+    // llame sin otro objeto como `this`.
+    private readonly fetchImplementation: typeof fetch = (input, init) =>
+      fetch(input, init),
   ) {
     const baseUrl = new URL(apiBaseUrl)
 

@@ -6,6 +6,9 @@ export default defineConfig({
   resolve: {
     alias: {
       "@": fileURLToPath(new URL("./src", import.meta.url)),
+      "virtual:instagram-post": fileURLToPath(
+        new URL("./src/services/instagram/instagram-post.stub.ts", import.meta.url),
+      ),
     },
   },
 

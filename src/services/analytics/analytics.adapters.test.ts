@@ -115,6 +115,25 @@ describe("analytics adapters and service", () => {
     expect(init).not.toHaveProperty("credentials")
   })
 
+  it("calls the global fetch without rebinding it to the adapter", async () => {
+    const browserLikeFetch = vi.fn(function (this: unknown) {
+      if (this !== undefined && this !== globalThis) {
+        throw new TypeError("Failed to execute 'fetch' on 'Window': Illegal invocation")
+      }
+      return Promise.resolve(new Response(null, { status: 202 }))
+    })
+
+    vi.stubGlobal("fetch", browserLikeFetch)
+
+    try {
+      await new ApiAnalyticsAdapter("https://analytics.example.test").send(event)
+    } finally {
+      vi.unstubAllGlobals()
+    }
+
+    expect(browserLikeFetch).toHaveBeenCalledOnce()
+  })
+
   it("surfaces HTTP and connectivity errors to the service", async () => {
     const failedResponse = new ApiAnalyticsAdapter(
       "http://localhost:3000",

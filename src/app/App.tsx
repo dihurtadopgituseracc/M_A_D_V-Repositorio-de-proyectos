@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react"
 import LandingPage from "@/pages/LandingPage"
 import GalleryPage from "@/pages/GalleryPage"
+import EventsPage from "@/pages/EventsPage"
+import FaqPage from "@/pages/FaqPage"
 import RepositoryPage from "@/pages/RepositoryPage"
 import ProjectDetailPage from "@/pages/ProjectDetailPage"
 import NeedDetailPage from "@/pages/NeedDetailPage"
@@ -29,6 +31,14 @@ function isGalleryFromUrl() {
   return new URLSearchParams(window.location.search).get("vista") === "gallery"
 }
 
+function isEventsFromUrl() {
+  return new URLSearchParams(window.location.search).get("vista") === "events"
+}
+
+function isFaqFromUrl() {
+  return new URLSearchParams(window.location.search).get("vista") === "faq"
+}
+
 export default function App() {
   const [selected, setSelected] = useState<Project | null>(getProjectFromUrl)
   const [repositoryOpen, setRepositoryOpen] = useState(
@@ -36,6 +46,12 @@ export default function App() {
   )
   const [galleryOpen, setGalleryOpen] = useState(
     () => !getProjectFromUrl() && isGalleryFromUrl(),
+  )
+  const [eventsOpen, setEventsOpen] = useState(
+    () => !getProjectFromUrl() && isEventsFromUrl(),
+  )
+  const [faqOpen, setFaqOpen] = useState(
+    () => !getProjectFromUrl() && isFaqFromUrl(),
   )
   const [selectedNeed, setSelectedNeed] = useState<{
     need: Need
@@ -48,6 +64,8 @@ export default function App() {
       setSelected(project)
       setRepositoryOpen(!project && isRepositoryFromUrl())
       setGalleryOpen(!project && isGalleryFromUrl())
+      setEventsOpen(!project && isEventsFromUrl())
+      setFaqOpen(!project && isFaqFromUrl())
       setSelectedNeed(null)
       trackCurrentPageView()
     }
@@ -66,6 +84,8 @@ export default function App() {
     setSelectedNeed(null)
     setRepositoryOpen(true)
     setGalleryOpen(false)
+    setEventsOpen(false)
+    setFaqOpen(false)
     scrollToTop()
   }
 
@@ -78,6 +98,39 @@ export default function App() {
     setSelectedNeed(null)
     setRepositoryOpen(false)
     setGalleryOpen(true)
+    setEventsOpen(false)
+    setFaqOpen(false)
+    scrollToTop()
+  }
+
+  const openEvents = () => {
+    const url = new URL(window.location.href)
+    url.searchParams.delete("proyecto")
+    url.searchParams.set("vista", "events")
+    window.history.pushState({}, "", `${url.pathname}${url.search}`)
+    setSelected(null)
+    setSelectedNeed(null)
+    setRepositoryOpen(false)
+    setGalleryOpen(false)
+    setEventsOpen(true)
+    setFaqOpen(false)
+    scrollToTop()
+  }
+
+  const closeEvents = () => {
+    const url = new URL(window.location.href)
+    url.searchParams.delete("vista")
+    window.history.pushState({}, "", `${url.pathname}${url.search}`)
+    setEventsOpen(false)
+    setFaqOpen(false)
+    scrollToTop()
+  }
+
+  const closeFaq = () => {
+    const url = new URL(window.location.href)
+    url.searchParams.delete("vista")
+    window.history.pushState({}, "", `${url.pathname}${url.search}`)
+    setFaqOpen(false)
     scrollToTop()
   }
 
@@ -111,6 +164,8 @@ export default function App() {
     setSelected(project)
     setRepositoryOpen(false)
     setGalleryOpen(false)
+    setEventsOpen(false)
+    setFaqOpen(false)
     setSelectedNeed(null)
     scrollToTop()
   }
@@ -130,6 +185,7 @@ export default function App() {
     <LandingPage
       onOpenRepository={openRepository}
       onOpenGallery={openGallery}
+      onOpenEvents={openEvents}
     />
   )
 
@@ -154,6 +210,10 @@ export default function App() {
     page = <RepositoryPage onOpen={navigate} onBack={closeRepository} />
   } else if (galleryOpen) {
     page = <GalleryPage onBack={closeGallery} />
+  } else if (eventsOpen) {
+    page = <EventsPage />
+  } else if (faqOpen) {
+    page = <FaqPage />
   }
 
   const backAction = selectedNeed
@@ -164,7 +224,11 @@ export default function App() {
         ? closeRepository
         : galleryOpen
           ? closeGallery
-          : null
+          : eventsOpen
+            ? closeEvents
+            : faqOpen
+              ? closeFaq
+              : null
   const backLabel = selectedNeed
     ? "Resumen del proyecto"
     : selected
@@ -174,7 +238,7 @@ export default function App() {
     ? "#171827"
     : repositoryOpen
       ? "#b7ff3c"
-      : selected || selectedNeed
+      : selected || selectedNeed || eventsOpen
         ? "#f6f3ea"
         : "#f0cb82"
   const navTextColor = galleryOpen ? "#ffffff" : "#171827"
@@ -219,6 +283,16 @@ export default function App() {
             label: "Sobre MADV",
             ariaLabel: "Conocer más sobre MADV",
             link: "./?vista=gallery",
+          },
+          {
+            label: "Eventos",
+            ariaLabel: "Ver eventos",
+            link: "./?vista=events",
+          },
+          {
+            label: "Preguntas",
+            ariaLabel: "Ver preguntas frecuentes",
+            link: "./?vista=faq",
           },
         ]}
         socialItems={[

@@ -9,7 +9,7 @@ Aplicación web para explorar proyectos de videojuegos, revisar su avance y sus 
 1. `index.html` define el documento, el título actual de pestaña (`Proyectos abiertos | MADV`) y carga `src/main.tsx` dentro de `#root`.
 2. `src/main.tsx` importa los estilos globales y monta React.
 3. `src/App.tsx` es una fachada que reexporta `src/app/App.tsx`.
-4. `src/app/App.tsx` decide qué vista mostrar: landing, repositorio, detalle del proyecto o detalle de una solicitud.
+4. `src/app/App.tsx` decide qué vista mostrar: landing, galería, eventos, repositorio, detalle del proyecto o detalle de una solicitud.
 5. `src/data/projects.ts` proporciona los datos que consumen las vistas y componentes.
 6. `src/component/StaggeredMenu.tsx` presenta la navegación global fija y el enlace de Instagram de GDD en todas las vistas.
 
@@ -22,7 +22,7 @@ Aplicación web para explorar proyectos de videojuegos, revisar su avance y sus 
 ├── pnpm-lock.yaml                # Versiones fijadas por pnpm
 ├── .env.example                  # Variables de ejemplo para analítica local/API
 ├── tsconfig.json                 # Configuración TypeScript y alias @/*
-├── vite.config.ts                # Vite, React, Tailwind, Figma Make y alias
+├── vite.config.ts                # Vite, React, Tailwind, Figma Make, alias y registro de visitas en dev
 ├── vitest.config.ts              # Alias y configuración de pruebas
 ├── .mise.toml                    # Versiones de Node y pnpm
 ├── .gitignore                    # Excluye dependencias, builds, secretos y estado local
@@ -54,6 +54,10 @@ Aplicación web para explorar proyectos de videojuegos, revisar su avance y sus 
     │   ├── environment.ts        # Selección segura del modo de analítica
     │   └── environment.test.ts   # Pruebas de configuración y valores por defecto
     ├── components/
+    │   ├── dimaac/
+    │   │   └── social-card.tsx  # SocialCard de DiMaac UI (registro shadcn; único cambio: prop showLikes); usa gsap y @gsap/react
+    │   ├── instagram/
+    │   │   └── InstagramPostCard.tsx # SocialCard con el post real de virtual:instagram-post y enlace al post
     │   ├── common/
     │   │   ├── ArtPlaceholder.tsx # Arte conceptual decorativo con color por proyecto
     │   │   ├── LandingPopup.tsx   # Capa inicial de presentación (preparada, aún sin montar)
@@ -77,12 +81,15 @@ Aplicación web para explorar proyectos de videojuegos, revisar su avance y sus 
     │       ├── analytics.service.ts # Fachada, selección y manejo de fallos
     │       ├── local.adapter.ts   # Buffer de memoria inspeccionable
     │       ├── api.adapter.ts     # POST HTTP sin credenciales ni reintentos
+    │       ├── visits-report.ts   # Lectura de .data/visits.jsonl, conteos y HTML del dashboard
     │       └── *.test.ts          # Validación y pruebas de adaptadores
     ├── data/
     │   └── projects.ts           # Catálogo local de proyectos y contenido asociado
     ├── pages/
     │   ├── LandingPage.tsx      # Portada y resumen de MADV
     │   ├── GalleryPage.tsx      # Carrusel de 12 imágenes, descripciones y visor 16:9
+    │   ├── EventsPage.tsx       # Página "Eventos": lugar de GDD, siguiente evento y post real de Instagram
+    │   ├── FaqPage.tsx          # Página de preguntas frecuentes (?vista=faq), solo accesible desde el menú
     │   ├── RepositoryPage.tsx    # Listado de proyectos
     │   ├── ProjectDetailPage.tsx # Detalle, avance, QR, herramientas y necesidades
     │   └── NeedDetailPage.tsx    # Detalle de una necesidad y contactos
@@ -95,15 +102,17 @@ Aplicación web para explorar proyectos de videojuegos, revisar su avance y sus 
 ## Navegación y vistas
 
 - `RepositoryPage` recorre `projects` y presenta una tarjeta por proyecto; cada tarjeta completa abre los detalles del proyecto y su botón de colaboración conserva el registro de clic. `ProjectCard` muestra las herramientas y las etiquetas con sus respectivos rótulos. Su identidad visual usa verdes eléctricos para diferenciar el catálogo de proyectos de la identidad amarilla de MADV. El encabezado comunica que son proyectos abiertos a colaboración (“Encuentra dónde aportar”) sin cambiar la navegación. “Volver a MADV” regresa a la portada y elimina `vista=repository` de la URL.
-- La raíz (`/`) muestra `LandingPage`; su logo principal es decorativo y no funciona como enlace. El CTA “Repositorio abierto” navega a `?vista=repository`; “Saber más del proyecto” abre `?vista=gallery`.
-- `StaggeredMenu` ocupa el encabezado superior de todas las vistas y enlaza a Inicio, Proyectos y Sobre MADV; el botón se desplaza con el contenido en lugar de permanecer fijo durante el scroll. También ofrece el Instagram de GDD (`@gdd_col`).
+- La raíz (`/`) muestra `LandingPage`; su logo principal es decorativo y no funciona como enlace. El CTA “Repositorio abierto” navega a `?vista=repository`; “Saber más del proyecto” abre `?vista=gallery` y “Eventos” abre `?vista=events`.
+- `EventsPage` (`?vista=events`) muestra el título “Eventos” en tamaño grande y un bloque con “¿Y en dónde puedo asistir a GDD?”, “Lugar: El salón nº 304 - CYT” y el encabezado “El siguiente evento es:”. Debajo, centrado, `InstagramPostCard` muestra el post configurado en `src/data/instagram-post.ts` como `SocialCard` (variante `instagram`, hasta 380 px, sin contador de likes mediante `showLikes={false}`, la única prop agregada al componente de DiMaac) y un botón oscuro de ancho completo “Ver publicación en Instagram” que abre el post en otra pestaña (ver “Publicación real de Instagram”). Si no hay enlace configurado, no se muestra ninguna tarjeta. La tarjeta usa `scheme="auto"`: sigue el modo claro u oscuro del sistema mediante la variante `dark:` predeterminada de Tailwind v4 (`prefers-color-scheme`), y sus animaciones GSAP se omiten con `prefers-reduced-motion: reduce`. Algunos textos internos del componente (“More options”, “View all … comments”) están en inglés porque vienen del registro de DiMaac; Me gusta/Guardar solo cambian el estado local. La flecha global regresa a la landing y elimina `vista` de la URL. La barra usa el fondo crema `#f6f3ea`. La vista no registra eventos de analítica. En `App.analytics.test.tsx`, `vi.mock("virtual:instagram-post")` provee un post de ejemplo.
+- `FaqPage` (`?vista=faq`) contiene las preguntas frecuentes con desplegables nativos (`details`/`summary`) sobre el fondo amarillo `#f0cb82`. Las preguntas viven en el arreglo `faqs` de `src/pages/FaqPage.tsx`. La landing no la enlaza; solo se llega desde el menú lateral (“Preguntas”) o por URL directa. La flecha global regresa a la landing y elimina `vista`. La vista no registra eventos de analítica.
+- `StaggeredMenu` ocupa el encabezado superior de todas las vistas y enlaza a Inicio, Proyectos, Sobre MADV, Eventos y Preguntas; el botón se desplaza con el contenido en lugar de permanecer fijo durante el scroll. También ofrece el Instagram de GDD (`@gdd_col`).
 - `App` compone una barra de navegación global única: la flecha accesible de regreso queda a la izquierda y `StaggeredMenu` a la derecha. Las vistas secundarias no renderizan barras o controles superiores duplicados.
 - La barra global recibe `headerColor` y `backButtonColor` según la vista activa para igualar el color de la sección inferior y mantener el contraste de “Menu +” y la flecha.
 - `GalleryPage` presenta `Titulo.svg`, `Contexto1.svg`, `Objetivos.svg`, `Problemas.svg`, `Roadmap.svg`, `Usuario.svg`, `Contexto2.svg`, `Entornos.svg`, `EntornoEsp.svg`, `Propuesta.svg`, `ArbolProb.svg` y `ArbustoProb.svg` desde `public/assets/gallery/` mediante `DepthCarousel`, sobre un fondo oscuro igual al carrusel y con tipografía clara. La descripción inferior cambia con la lámina activa y al tocar una tarjeta se abre el visor 16:9 a pantalla completa, con navegación, cierre y soporte de teclado; si un SVG no carga, se muestra su nombre como fallback.
-- La landing presenta una introducción de MADV, una sección de preguntas frecuentes con desplegables nativos (`details`/`summary`) y una lista breve de los proyectos existentes. Los contadores de proyectos y oportunidades se muestran en `RepositoryPage`, junto con el encabezado del catálogo. No añade proyectos ni modifica el catálogo.
+- La landing presenta una introducción de MADV y una lista breve de los proyectos existentes; las preguntas frecuentes están en `FaqPage`. Los contadores de proyectos y oportunidades se muestran en `RepositoryPage`, junto con el encabezado del catálogo. No añade proyectos ni modifica el catálogo.
 - La sección “Qué implica el proyecto…” incluye un `HalftoneReveal` interactivo con `ScrollBG.jpg` y un subtítulo sobre el crecimiento de la comunidad.
 - `LandingPopup` encapsula la futura capa inicial de presentación: usa `PopUp.svg` cuando ese recurso esté disponible, aparece una vez por sesión, escucha el primer toque/clic o Escape, activa un desvanecimiento de 450 ms y luego se desmonta. El componente aún no está montado en `LandingPage` y `public/assets/branding/PopUp.svg` todavía no existe; al agregarlos, la landing se mantiene debajo de la capa sin cambiar la navegación.
-- La navegación entre landing, galería, repositorio, proyectos y necesidades cambia las vistas de forma instantánea, sin swipe ni slide horizontal.
+- La navegación entre landing, galería, eventos, repositorio, proyectos y necesidades cambia las vistas de forma instantánea, sin swipe ni slide horizontal.
 - `LandingPage` incluye `ScrollExpand` con `LogoMADV.jpg` como recurso visual. La animación usa el scroll de la ventana para expandir el marco, revelar el contenido y mantener la navegación existente sin dependencias externas.
 - Los recursos visuales se organizan en `public/assets/branding/`, `public/assets/gallery/` y `public/assets/projects/`. Se referencian desde la web anteponiendo `import.meta.env.BASE_URL` a `assets/<grupo>/<archivo>` para respetar la base de despliegue. El logo de MADV se encuentra en `public/assets/branding/LogoMADV.svg` y `LogoMADV.jpg`; las 12 láminas están en `gallery/` y el arte de tarjetas en `projects/`. Los archivos conservan sus nombres originales.
 - `repository_view` se registra al entrar al listado, no al visitar la landing. `trackCurrentPageView` distingue el listado mediante `vista=repository`.
@@ -139,15 +148,34 @@ Los objetivos de colaboración son `project_card`, `project_interest` y `need_co
 ## Servicio y configuración de analítica
 
 - Componentes llaman funciones de `analytics.service.ts`; no conocen `fetch`, almacenamiento, endpoints ni selección de adaptador.
-- `environment.ts` lee `VITE_ANALYTICS_MODE` y `VITE_API_BASE_URL`. El modo predeterminado es `local`. API solo se activa cuando el modo vale `api` y la URL base es HTTP(S), válida y sin credenciales; si falta o es inválida, se usa modo local.
-- `.env.example` muestra configuración local y un ejemplo comentado para API. Las variables `VITE_*` son públicas y nunca deben contener secretos.
+- `environment.ts` lee `VITE_ANALYTICS_MODE` y `VITE_API_BASE_URL`. El modo predeterminado es `local`. API solo se activa cuando el modo vale `api` y la URL base es HTTP(S), válida y sin credenciales; si falta o es inválida, se usa modo local. La URL base también puede ser una ruta relativa al sitio (`/`), que se resuelve contra el origen actual más `import.meta.env.BASE_URL`; así los eventos van al mismo servidor que sirve la página.
+- `.env.example` muestra configuración local y ejemplos comentados para API. `.env.development.local` (ignorado por Git) activa `VITE_ANALYTICS_MODE=api` con `VITE_API_BASE_URL=/` solo en modo desarrollo. Las variables `VITE_*` son públicas y nunca deben contener secretos.
 - `local.adapter.ts` conserva eventos en un buffer en memoria de esta pestaña y los muestra en consola de desarrollo. `getEvents()` facilita su inspección; no usa `localStorage`, no sincroniza dispositivos y no representa estadísticas globales. El buffer se pierde al recargar o cerrar la pestaña.
-- `api.adapter.ts` envía cada evento con un `POST` a `<VITE_API_BASE_URL>/api/events`, sin autenticación, reintentos ni credenciales. Errores HTTP y de conectividad llegan a la fachada, que los maneja sin lanzar excepciones a la interfaz.
-- Activar backend después de implementarlo: definir `VITE_ANALYTICS_MODE=api` y `VITE_API_BASE_URL=https://<host-configurado>`, sin cambiar los componentes.
+- `api.adapter.ts` envía cada evento con un `POST` a `<VITE_API_BASE_URL>/api/events`, sin autenticación, reintentos ni credenciales. Llama a `fetch` global sin reasignar su `this` (de lo contrario el navegador lanza "Illegal invocation"). Errores HTTP y de conectividad llegan a la fachada, que los maneja sin lanzar excepciones a la interfaz.
+- Activar un backend externo: definir `VITE_ANALYTICS_MODE=api` y `VITE_API_BASE_URL=https://<host-configurado>`, sin cambiar los componentes.
+
+## Publicación real de Instagram
+
+- La única configuración es `export const instagramPostUrl = "..."` en `src/data/instagram-post.ts`. Acepta enlaces públicos `https://www.instagram.com/p/<código>/`, `/reel/<código>/`, `/tv/<código>/`, la forma `/<usuario>/p/<código>/` y enlaces con `?igsh=`. Con `""` no se muestra nada.
+- `instagramPostPlugin` (en `vite.config.ts`) expone el módulo `virtual:instagram-post`. Al arrancar `vite` o en `vite build` pide la URL canónica del post con el user-agent de vista previa de enlaces (`facebookexternalhit`), lee las etiquetas `og:` (usuario, nombre visible, fecha, texto, imagen 640×640) y la `og:image` del perfil como avatar. Descarga ambas imágenes, solo desde `*.cdninstagram.com`/`*.fbcdn.net`, con límite de 5 MB, y las inserta como data URL. El navegador nunca contacta a Instagram, las URLs firmadas del CDN no caducan en la página y el build estático no necesita servidor.
+- `src/data/instagram-post.ts` es dependencia de la configuración: al guardarlo, Vite reinicia el servidor y vuelve a descargar el post. En producción, los datos quedan fijados en el momento del build; para actualizarlos hay que volver a compilar.
+- `src/services/instagram/instagram-post.ts` contiene la lógica pura (validación de URL, lectura de etiquetas, decodificación de entidades, fecha en español) y se prueba con etiquetas reales capturadas del post `BsOGulcndj-`. En Vitest, `virtual:instagram-post` apunta a `instagram-post.stub.ts` (`status: "empty"`).
+- Si el post es privado, fue borrado, Instagram limita la petición o cambia el formato de sus etiquetas, el módulo exporta `status: "error"`, Vite muestra un aviso y la página muestra solo el enlace “Ver publicación en Instagram” (en desarrollo también el motivo).
+- El método depende del HTML público de Instagram, que no es una API documentada. La alternativa oficial y estable es la Instagram Graph API con una cuenta Business/Creator y un token de acceso.
+
+## Registro de visitas en el servidor de Vite
+
+El plugin `visitsDashboardPlugin` de `vite.config.ts` (solo `vite`/dev, `apply: "serve"`) implementa el contrato `POST /api/events` mientras la página se sirve con el servidor de desarrollo:
+
+- `POST <base>api/events`: exige `Content-Type: application/json` (`415`), cuerpo de hasta 4 KB (`413`), JSON válido (`400`) y un evento que pase `isAnalyticsEvent` (`422`). Los eventos aceptados se agregan a `.data/visits.jsonl` con `received_at` (hora del servidor) y responde `202`. Otros métodos reciben `405`.
+- `GET <base>dashboard-visitas`: HTML de texto plano (`noindex`, `no-store`) con vistas totales, vistas del listado, vistas por proyecto y por necesidad, clics por evento/destino/proyecto y la fecha del primer y último registro. Ninguna vista de la app lo enlaza.
+- El plugin carga `visits-report.ts`, `analytics.types.ts` y `projects.ts` con `server.ssrLoadModule`, de modo que usa el mismo validador y catálogo que el cliente. Las líneas corruptas o que ya no cumplen el contrato se cuentan como descartadas.
+- `.data/` está en `.gitignore` y excluido del watcher de Vite. Borrar `.data/visits.jsonl` reinicia los conteos.
+- Limitaciones: no hay autenticación (cualquiera con la URL del servidor puede ver el dashboard o enviar eventos válidos), ni límite de tasa, ni visitantes únicos. El build estático (`pnpm build`) no incluye estas rutas; en un despliegue estático los `POST` fallan sin afectar la interfaz.
 
 ## Contrato futuro del backend
 
-Este repositorio implementa el cliente HTTP, no el servidor. La persistencia compartida, la validación definitiva y las consultas agregadas no funcionan hasta que exista backend real.
+Este repositorio implementa el cliente HTTP y, solo en el servidor de desarrollo de Vite, un receptor de `POST /api/events` que guarda en archivo (ver la sección anterior). La persistencia compartida en producción, la validación definitiva y las consultas agregadas por API requieren un backend real.
 
 ### `POST /api/events`
 
@@ -264,7 +292,7 @@ El sitio es una SPA estática: `pnpm build` genera `dist/` y no necesita servido
 - Configuración de build: comando `pnpm build`, directorio de salida `dist`.
 - Publicación desde la carpeta local sin repositorio: `pnpm dlx vercel --prod` (requiere sesión) o `pnpm dlx vercel deploy --temporary --yes` para una URL anónima que expira en 60 minutos y puede reclamarse.
 - Publicación continua: conectar el repositorio de GitHub al proyecto de Vercel; cada envío a la rama principal actualiza producción y cada rama o PR genera una vista previa.
-- Rutas: la navegación usa query strings (`?vista=repository`, `?vista=gallery`, `?proyecto=<id>`), por lo que no se requiere reescritura de rutas en el host.
+- Rutas: la navegación usa query strings (`?vista=repository`, `?vista=gallery`, `?vista=events`, `?vista=faq`, `?proyecto=<id>`), por lo que no se requiere reescritura de rutas en el host.
 - Variables: `VITE_ANALYTICS_MODE` y `VITE_API_BASE_URL` se configuran en el panel del host, nunca en el repositorio. Sin ellas, la analítica queda en modo local.
 - `.vercel` está excluido por `.gitignore`; `dist/` y `node_modules/` tampoco se versionan.
 

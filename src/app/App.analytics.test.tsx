@@ -14,6 +14,23 @@ import { localAnalyticsAdapter } from "@/services/analytics/local.adapter"
 
 import { trackCurrentPageView } from "@/services/analytics/analytics.service"
 
+// La página de Eventos muestra el post configurado; aquí se usa uno de ejemplo
+// en lugar del sustituto vacío.
+vi.mock("virtual:instagram-post", () => ({
+  default: {
+    status: "ok",
+    post: {
+      permalink: "https://www.instagram.com/p/TEST12345/",
+      shortcode: "TEST12345",
+      username: "gdd_col",
+      displayName: "Gamers, Developers & Designers",
+      caption: "Taller de prueba en CYT 304",
+      publishedOn: "2026-10-22",
+      image: null,
+    },
+  },
+}))
+
 Object.defineProperty(globalThis, "IS_REACT_ACT_ENVIRONMENT", {
   configurable: true,
 
@@ -144,6 +161,66 @@ describe("analytics interface instrumentation", () => {
       { event_name: "repository_view" },
     ])
     expect(localAnalyticsAdapter.getEvents()).toHaveLength(1)
+  })
+
+  it("shows the FAQ only on its own page and returns to the landing", async () => {
+    await renderApp("/")
+
+    expect(container.querySelector("details")).toBeNull()
+    expect(container.textContent).not.toContain("Preguntas frecuentes")
+
+    await act(async () => {
+      root.unmount()
+    })
+    root = createRoot(container)
+    await renderApp("/?vista=faq")
+
+    expect(container.querySelector("h1")?.textContent).toBe(
+      "Todo lo que necesitas saber para participar.",
+    )
+    expect(container.querySelectorAll("details")).toHaveLength(9)
+    expect(localAnalyticsAdapter.getEvents()).toEqual([])
+
+    await click(container.querySelector('button[aria-label="Volver a MADV"]'))
+
+    expect(window.location.search).toBe("")
+    expect(container.querySelector("details")).toBeNull()
+  })
+
+  it("shows where to attend GDD, the next event heading and the Instagram post", async () => {
+    vi.stubGlobal(
+      "matchMedia",
+      vi.fn((query: string) => ({
+        matches: query.includes("reduce"),
+        media: query,
+        addEventListener: vi.fn(),
+        removeEventListener: vi.fn(),
+        addListener: vi.fn(),
+        removeListener: vi.fn(),
+      })),
+    )
+
+    await renderApp("/?vista=events")
+
+    expect(container.querySelector("h1")?.textContent).toBe("Eventos")
+    expect(
+      Array.from(container.querySelectorAll("main h2")).map((h) => h.textContent),
+    ).toEqual(["¿Y en dónde puedo asistir a GDD?", "El siguiente evento es:"])
+    expect(container.textContent).toContain("Lugar: El salón nº 304 - CYT")
+    expect(container.querySelector("main p h2")).toBeNull()
+
+    const ids = Array.from(container.querySelectorAll("main [id]")).map((el) => el.id)
+    expect(new Set(ids).size).toBe(ids.length)
+
+    const card = container.querySelector('article[data-variant="instagram"]')
+    expect(card?.textContent).toContain("gdd_col")
+    expect(card?.textContent).toContain("Taller de prueba")
+    expect(card?.textContent).not.toMatch(/\blikes\b/)
+    expect(container.querySelectorAll('article[data-variant="instagram"]')).toHaveLength(1)
+    expect(
+      container.querySelector('a[href="https://www.instagram.com/p/TEST12345/"]')?.textContent,
+    ).toContain("Ver publicación en Instagram")
+    expect(localAnalyticsAdapter.getEvents()).toEqual([])
   })
 
   it("returns to the landing from the repository", async () => {
