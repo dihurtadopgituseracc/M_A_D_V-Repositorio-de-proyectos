@@ -146,6 +146,11 @@ export default function LandingPage({
             >
               Una comunidad que crece cuando compartimos lo que sabemos.
             </h3>
+             <h3
+              className={`${semi} mt-6 max-w-[760px] text-[18px] leading-[1.2] text-[#171827] sm:text-[32px]`}
+            >
+             La colaboración con el Grupo de Desarrolladores y Diseñadores (GDD) fue fundamental para el desarrollo de la investigación de MADV en el marco del componente de Proyecto de Grado de la UCMC. Su participación permitió acceder al contexto real de estudio, conocer las dinámicas de trabajo de los equipos, recopilar información y reconocer necesidades que orientaron el proceso de diseño. En este sentido, el GDD no fue únicamente un contexto de aplicación, sino un actor esencial para la construcción de la investigación: sin su disposición, participación y colaboración, no habría sido posible desarrollar el proyecto bajo las condiciones y con el alcance alcanzado
+            </h3>
           </div>
         </div>
       </section>

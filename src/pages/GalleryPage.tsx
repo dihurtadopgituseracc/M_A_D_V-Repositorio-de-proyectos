@@ -12,28 +12,28 @@ const galleryItems = [
     src: galleryAssetUrl("Titulo.svg"),
     alt: "Título y portada de MADV",
     description:
-      "La portada presenta MADV como un punto de encuentro para proyectos de videojuegos.",
+      "	Identificar el proyecto y establecer su identidad visual.",
   },
   {
     number: "02",
     src: galleryAssetUrl("Contexto1.svg"),
     alt: "Contexto del proyecto MADV",
     description:
-      "El contexto explica la necesidad de conectar proyectos con personas dispuestas a colaborar.",
+      "Introducir el contexto general en el que surge MADV.",
   },
   {
     number: "03",
     src: galleryAssetUrl("Objetivos.svg"),
     alt: "Objetivos del proyecto MADV",
     description:
-      "Los objetivos definen cómo MADV facilita el descubrimiento y la colaboración entre equipos.",
+      "	Comunicar el propósito y los objetivos del proyecto.",
   },
   {
     number: "04",
     src: galleryAssetUrl("Problemas.svg"),
     alt: "Problemas que aborda MADV",
     description:
-      "La propuesta responde a las dificultades para encontrar apoyo, visibilidad y recursos.",
+      "Sintetizar la situación problemática identificada.",
   },
   {
     number: "05",
@@ -47,7 +47,7 @@ const galleryItems = [
     src: galleryAssetUrl("Usuario.svg"),
     alt: "Perfil de usuario de MADV",
     description:
-      "El perfil de usuario muestra a las personas que buscan descubrir proyectos y aportar sus habilidades.",
+      "El perfil de usuario muestra a las personas que buscan descubrir proyectos y aportar sus habilidades, 	Presentar los usuarios y sus características relevantes.",
   },
   {
     number: "07",
@@ -179,20 +179,17 @@ export default function GalleryPage({ onBack }: { onBack: () => void }) {
     <main className="min-h-[100dvh] bg-[#171827] px-5 pb-16 pt-5 text-white sm:px-8 sm:pt-8 lg:px-10">
       <div className="mx-auto max-w-[1120px]">
         <section className="pt-10 sm:pt-14">
-          <p className={`${semi} text-[10px] uppercase text-white/65`}>
+          <p className={`${semi} text-[22px] uppercase text-white/65`}>
             Sobre el proyecto
           </p>
-          <h1
-            className={`${semi} mt-2 text-[32px] leading-tight text-white sm:text-[42px]`}
-          >
-            Imágenes de MADV
-          </h1>
+          
           <p
             className={`${reg} mt-3 max-w-[620px] text-[13px] leading-relaxed text-white/70`}
-          >
-            Un recorrido visual por MADV y los proyectos que forman parte de su
-            comunidad. Desliza o usa las flechas para cambiar de lámina; toca
-            una para verla completa.
+          >MADV es un proyecto académico desarrollado en el componente de Proyecto de Grado del programa de Diseño Digital y Multimedia. Investiga las dinámicas de colaboración y articulación de capacidades en el Grupo de Desarrolladores y Diseñadores (GDD) de la Universidad Nacional de Colombia, en el contexto del desarrollo colectivo de videojuegos.
+
+Como resultado, propone una mediación físico-digital para visibilizar proyectos, sus avances y necesidades de colaboración, materializada en un prototipo web que facilita la consulta de información y la conexión entre equipos y posibles colaboradores.
+
+El proyecto integra investigación, metodología y diseño, desde el análisis del contexto hasta el desarrollo y evaluación de la propuesta.
           </p>
 
           <div className="mt-8 overflow-hidden rounded-[10px] bg-[#171827] px-2 py-4 sm:px-6 sm:py-6">
@@ -201,8 +198,8 @@ export default function GalleryPage({ onBack }: { onBack: () => void }) {
                 image: item.src,
                 alt: item.alt,
               }))}
-              cardWidth={480}
-              cardHeight={270}
+              cardWidth={500}
+              cardHeight={290}
               radius={6}
               depth={180}
               spread={72}

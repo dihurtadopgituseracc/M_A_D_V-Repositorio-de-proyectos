@@ -34,7 +34,8 @@ Aplicación web para explorar proyectos de videojuegos, revisar su avance y sus 
 ├── public/
 │   └── assets/
 │       ├── branding/
-│       │   └── LogoMADV.svg      # Logo de la landing
+│       │   ├── LogoMADV.svg      # Logo de la landing
+│       │   └── qr-landing-madv.svg # QR estático de la URL pública de la landing
 │       ├── gallery/              # 12 láminas .svg del recorrido visual:
 │       │                         # Titulo, Contexto1, Contexto2, Objetivos,
 │       │                         # Problemas, Propuesta, Roadmap, Usuario,
@@ -114,7 +115,7 @@ Aplicación web para explorar proyectos de videojuegos, revisar su avance y sus 
 - `LandingPopup` encapsula la futura capa inicial de presentación: usa `PopUp.svg` cuando ese recurso esté disponible, aparece una vez por sesión, escucha el primer toque/clic o Escape, activa un desvanecimiento de 450 ms y luego se desmonta. El componente aún no está montado en `LandingPage` y `public/assets/branding/PopUp.svg` todavía no existe; al agregarlos, la landing se mantiene debajo de la capa sin cambiar la navegación.
 - La navegación entre landing, galería, eventos, repositorio, proyectos y necesidades cambia las vistas de forma instantánea, sin swipe ni slide horizontal.
 - `LandingPage` incluye `ScrollExpand` con `LogoMADV.jpg` como recurso visual. La animación usa el scroll de la ventana para expandir el marco, revelar el contenido y mantener la navegación existente sin dependencias externas.
-- Los recursos visuales se organizan en `public/assets/branding/`, `public/assets/gallery/` y `public/assets/projects/`. Se referencian desde la web anteponiendo `import.meta.env.BASE_URL` a `assets/<grupo>/<archivo>` para respetar la base de despliegue. El logo de MADV se encuentra en `public/assets/branding/LogoMADV.svg` y `LogoMADV.jpg`; las 12 láminas están en `gallery/` y el arte de tarjetas en `projects/`. Los archivos conservan sus nombres originales.
+- Los recursos visuales se organizan en `public/assets/branding/`, `public/assets/gallery/` y `public/assets/projects/`. Se referencian desde la web anteponiendo `import.meta.env.BASE_URL` a `assets/<grupo>/<archivo>` para respetar la base de despliegue. El logo de MADV se encuentra en `public/assets/branding/LogoMADV.svg` y `LogoMADV.jpg`; `public/assets/branding/qr-landing-madv.svg` contiene el QR estático de `https://prototipo-de-app-de-proyectos.vercel.app/`, sin incorporarse a la interfaz; las 12 láminas están en `gallery/` y el arte de tarjetas en `projects/`. Los archivos conservan sus nombres originales.
 - `repository_view` se registra al entrar al listado, no al visitar la landing. `trackCurrentPageView` distingue el listado mediante `vista=repository`.
 - Al seleccionar un proyecto, `app/App.tsx` actualiza el estado y agrega su ID a la query string: `?proyecto=<id>`.
 - `proyecto=<id>` tiene prioridad sobre `vista`; por ello los enlaces directos y QR existentes continúan abriendo la ficha del proyecto.
