@@ -113,15 +113,27 @@ function GalleryImage({
 
   expanded?: boolean
 }) {
+  const [imageState, setImageState] = useState<"loading" | "loaded" | "error">(
+    "loading",
+  )
+
+  useEffect(() => {
+    setImageState("loading")
+  }, [item.src])
+
+  const imageFailed = imageState === "error"
+
   return (
     <div
-      className={`relative flex h-full w-full items-center justify-center overflow-hidden bg-tinta ${
+      className={`relative flex h-full w-full items-center justify-center overflow-hidden bg-crema ${
         expanded ? "aspect-video" : "aspect-[16/10]"
       }`}
     >
       <div
         aria-hidden="true"
-        className="absolute inset-0 flex flex-col items-center justify-center gap-2 text-center text-white/70"
+        className={`absolute inset-0 flex flex-col items-center justify-center gap-2 text-center text-white/70 transition-opacity ${
+          imageFailed ? "opacity-100" : "pointer-events-none opacity-0"
+        }`}
       >
         <span className={`${semi} text-[28px] text-oro`}>{item.number}</span>
         <span className={`${reg} text-[11px]`}>
@@ -135,7 +147,9 @@ function GalleryImage({
         src={item.src}
         alt={item.alt}
         loading="lazy"
+        onLoad={() => setImageState("loaded")}
         onError={(event) => {
+          setImageState("error")
           event.currentTarget.style.display = "none"
         }}
         className="absolute inset-0 h-full w-full object-cover"

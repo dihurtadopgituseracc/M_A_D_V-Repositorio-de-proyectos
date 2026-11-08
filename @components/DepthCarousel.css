@@ -37,7 +37,7 @@
   left: 50%;
   transform-origin: center center;
   overflow: hidden;
-  background: #0b0d12;
+  background: #f6f3ea;
   box-shadow:
     0 30px 60px -20px rgba(0, 0, 0, 0.65),
     0 8px 20px -10px rgba(0, 0, 0, 0.5);
