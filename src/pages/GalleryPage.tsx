@@ -2,6 +2,7 @@ import { useEffect, useState } from "react"
 
 import { reg, semi } from "@/constants/styles"
 import DepthCarousel from "@/component/DepthCarousel"
+import AngleIcon from "@/components/common/AngleIcon"
 
 const galleryAssetUrl = (fileName: string) =>
   `${import.meta.env.BASE_URL}assets/gallery/${fileName}`
@@ -11,81 +12,91 @@ const galleryItems = [
     number: "01",
     src: galleryAssetUrl("Titulo.svg"),
     alt: "Título y portada de MADV",
-    description:
-      "	Identificar el proyecto y establecer su identidad visual.",
+    description: "Identificar el proyecto y establecer su identidad visual.",
   },
   {
     number: "02",
     src: galleryAssetUrl("Contexto1.svg"),
     alt: "Contexto del proyecto MADV",
-    description:
-      "Introducir el contexto general en el que surge MADV.",
+    description: "Introducir el contexto general en el que surge MADV.",
   },
   {
     number: "03",
     src: galleryAssetUrl("Objetivos.svg"),
     alt: "Objetivos del proyecto MADV",
-    description:
-      "	Comunicar el propósito y los objetivos del proyecto.",
+    description: "Comunicar el propósito y los objetivos del proyecto.",
   },
   {
     number: "04",
     src: galleryAssetUrl("Problemas.svg"),
     alt: "Problemas que aborda MADV",
-    description:
-      "Sintetizar la situación problemática identificada.",
+    description: "Sintetizar la situación problemática identificada.",
   },
   {
     number: "05",
+    src: galleryAssetUrl("Metodologia.svg"),
+    alt: "Metodología del proyecto MADV",
+    description:
+      "Explicar la metodología utilizada para investigar y orientar el diseño.",
+  },
+  {
+    number: "06",
+    src: galleryAssetUrl("Testeos y desarrollo.svg"),
+    alt: "Testeos y desarrollo del proyecto MADV",
+    description:
+      "Mostrar el desarrollo de la propuesta y los aprendizajes de los testeos.",
+  },
+  {
+    number: "07",
     src: galleryAssetUrl("Roadmap.svg"),
     alt: "Roadmap del proyecto MADV",
     description:
       "El roadmap resume las etapas previstas para hacer crecer la plataforma y su comunidad.",
   },
   {
-    number: "06",
+    number: "08",
     src: galleryAssetUrl("Usuario.svg"),
     alt: "Perfil de usuario de MADV",
     description:
-      "El perfil de usuario muestra a las personas que buscan descubrir proyectos y aportar sus habilidades, 	Presentar los usuarios y sus características relevantes.",
+      "El perfil de usuario muestra a las personas que buscan descubrir proyectos y aportar sus habilidades.",
   },
   {
-    number: "07",
+    number: "09",
     src: galleryAssetUrl("Contexto2.svg"),
     alt: "Continuación del contexto del proyecto MADV",
     description:
       "Esta segunda parte amplía el contexto y las oportunidades que existen alrededor de los proyectos.",
   },
   {
-    number: "08",
+    number: "10",
     src: galleryAssetUrl("Entornos.svg"),
     alt: "Entornos del proyecto Stewart",
     description:
       "La exploración de entornos muestra referencias visuales del proyecto Stewart.",
   },
   {
-    number: "09",
+    number: "11",
     src: galleryAssetUrl("EntornoEsp.svg"),
     alt: "Entorno especial del proyecto Stewart",
     description:
       "Un acercamiento a la ambientación y al entorno especial planteado para Stewart.",
   },
   {
-    number: "10",
+    number: "12",
     src: galleryAssetUrl("Propuesta.svg"),
     alt: "Propuesta del proyecto MADV",
     description:
       "La propuesta reúne la solución visual y funcional para organizar proyectos abiertos.",
   },
   {
-    number: "11",
+    number: "13",
     src: galleryAssetUrl("ArbolProb.svg"),
     alt: "Árbol con problema del proyecto Stewart",
     description:
       "El árbol de problemas ordena las causas y consecuencias que afectan al proyecto Stewart.",
   },
   {
-    number: "12",
+    number: "14",
     src: galleryAssetUrl("ArbustoProb.svg"),
     alt: "Arbusto con problema del proyecto Stewart",
     description:
@@ -182,14 +193,29 @@ export default function GalleryPage({ onBack }: { onBack: () => void }) {
           <p className={`${semi} text-[22px] uppercase text-white/65`}>
             Sobre el proyecto
           </p>
-          
+          <h1 className={`${semi} mt-2 text-[34px] text-white sm:text-[44px]`}>
+            Imágenes de MADV
+          </h1>
           <p
             className={`${reg} mt-3 max-w-[620px] text-[13px] leading-relaxed text-white/70`}
-          >MADV es un proyecto académico desarrollado en el componente de Proyecto de Grado del programa de Diseño Digital y Multimedia. Investiga las dinámicas de colaboración y articulación de capacidades en el Grupo de Desarrolladores y Diseñadores (GDD) de la Universidad Nacional de Colombia, en el contexto del desarrollo colectivo de videojuegos.
-
-Como resultado, propone una mediación físico-digital para visibilizar proyectos, sus avances y necesidades de colaboración, materializada en un prototipo web que facilita la consulta de información y la conexión entre equipos y posibles colaboradores.
-
-El proyecto integra investigación, metodología y diseño, desde el análisis del contexto hasta el desarrollo y evaluación de la propuesta.
+          >
+            MADV es un proyecto académico desarrollado en el componente de
+            Proyecto de Grado del programa de Diseño Digital y Multimedia.
+            Investiga las dinámicas de colaboración y articulación de
+            capacidades en el Grupo de Desarrolladores y Diseñadores (GDD) de la
+            Universidad Nacional de Colombia, en el contexto del desarrollo
+            colectivo de videojuegos.
+            <br />
+            <br />
+            Como resultado, propone una mediación físico-digital para
+            visibilizar proyectos, sus avances y necesidades de colaboración,
+            materializada en un prototipo web que facilita la consulta de
+            información y la conexión entre equipos y posibles colaboradores.
+            <br />
+            <br />
+            El proyecto integra investigación, metodología y diseño, desde el
+            análisis del contexto hasta el desarrollo y evaluación de la
+            propuesta.
           </p>
 
           <div className="mt-8 overflow-hidden rounded-[10px] bg-[#171827] px-2 py-4 sm:px-6 sm:py-6">
@@ -262,7 +288,7 @@ El proyecto integra investigación, metodología y diseño, desde el análisis d
               aria-label="Imagen anterior"
               className="grid size-9 shrink-0 place-items-center rounded-full text-[24px] text-white transition hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-white sm:size-11"
             >
-              ‹
+              <AngleIcon direction="left" className="size-5" />
             </button>
             <div className="aspect-video max-h-full w-full max-w-[1100px] overflow-hidden">
               <GalleryImage item={activeItem} expanded />
@@ -277,7 +303,7 @@ El proyecto integra investigación, metodología y diseño, desde el análisis d
               aria-label="Imagen siguiente"
               className="grid size-9 shrink-0 place-items-center rounded-full text-[24px] text-white transition hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-white sm:size-11"
             >
-              ›
+              <AngleIcon className="size-5" />
             </button>
           </div>
 

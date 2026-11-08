@@ -7,6 +7,7 @@ import RepositoryPage from "@/pages/RepositoryPage"
 import ProjectDetailPage from "@/pages/ProjectDetailPage"
 import NeedDetailPage from "@/pages/NeedDetailPage"
 import StaggeredMenu from "@/component/StaggeredMenu"
+import AngleIcon from "@/components/common/AngleIcon"
 import type { Need, Project } from "@/types/project"
 import { projects } from "@/data/projects"
 import { scrollToTop } from "@/utils/scroll"
@@ -261,7 +262,7 @@ export default function App() {
               aria-label={backLabel}
               className="sm-back-button"
             >
-              <span aria-hidden="true">←</span>
+              <AngleIcon direction="left" className="size-5" />
               <span className="sr-only">{backLabel}</span>
             </button>
           ) : (

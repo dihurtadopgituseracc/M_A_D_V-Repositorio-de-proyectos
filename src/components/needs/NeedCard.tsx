@@ -1,5 +1,6 @@
 import { semi, reg } from "@/constants/styles"
 import type { Need } from "@/types/project"
+import AngleIcon from "@/components/common/AngleIcon"
 
 export default function NeedCard({
   need,
@@ -40,7 +41,7 @@ export default function NeedCard({
         </span>
       </div>
       <span className="grid size-8 place-items-center rounded-full bg-[#f6f3ea] text-[20px] text-[#171827] transition group-hover:translate-x-0.5 group-hover:bg-[#287b86] group-hover:text-white">
-        ›
+        <AngleIcon className="size-4" />
       </span>
     </button>
   )

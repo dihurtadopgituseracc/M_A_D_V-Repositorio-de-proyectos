@@ -114,7 +114,7 @@ describe("analytics interface instrumentation", () => {
     expect(container.querySelector("h1")?.textContent).toBe("Imágenes de MADV")
     expect(
       container.querySelectorAll('button[aria-label^="Abrir imagen"]'),
-    ).toHaveLength(12)
+    ).toHaveLength(14)
     expect(
       Array.from(container.querySelectorAll("img")).map((image) =>
         image.getAttribute("src"),
@@ -124,6 +124,8 @@ describe("analytics interface instrumentation", () => {
       "/assets/gallery/Contexto1.svg",
       "/assets/gallery/Objetivos.svg",
       "/assets/gallery/Problemas.svg",
+      "/assets/gallery/Metodologia.svg",
+      "/assets/gallery/Testeos y desarrollo.svg",
       "/assets/gallery/Roadmap.svg",
       "/assets/gallery/Usuario.svg",
       "/assets/gallery/Contexto2.svg",
@@ -204,21 +206,29 @@ describe("analytics interface instrumentation", () => {
 
     expect(container.querySelector("h1")?.textContent).toBe("Eventos")
     expect(
-      Array.from(container.querySelectorAll("main h2")).map((h) => h.textContent),
+      Array.from(container.querySelectorAll("main h2")).map(
+        (h) => h.textContent,
+      ),
     ).toEqual(["¿Y en dónde puedo asistir a GDD?", "El siguiente evento es:"])
     expect(container.textContent).toContain("Lugar: El salón nº 304 - CYT")
     expect(container.querySelector("main p h2")).toBeNull()
 
-    const ids = Array.from(container.querySelectorAll("main [id]")).map((el) => el.id)
+    const ids = Array.from(container.querySelectorAll("main [id]")).map(
+      (el) => el.id,
+    )
     expect(new Set(ids).size).toBe(ids.length)
 
     const card = container.querySelector('article[data-variant="instagram"]')
     expect(card?.textContent).toContain("gdd_col")
     expect(card?.textContent).toContain("Taller de prueba")
     expect(card?.textContent).not.toMatch(/\blikes\b/)
-    expect(container.querySelectorAll('article[data-variant="instagram"]')).toHaveLength(1)
     expect(
-      container.querySelector('a[href="https://www.instagram.com/p/TEST12345/"]')?.textContent,
+      container.querySelectorAll('article[data-variant="instagram"]'),
+    ).toHaveLength(1)
+    expect(
+      container.querySelector(
+        'a[href="https://www.instagram.com/p/TEST12345/"]',
+      )?.textContent,
     ).toContain("Ver publicación en Instagram")
     expect(localAnalyticsAdapter.getEvents()).toEqual([])
   })

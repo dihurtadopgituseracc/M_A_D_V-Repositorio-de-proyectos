@@ -36,10 +36,11 @@ Aplicación web para explorar proyectos de videojuegos, revisar su avance y sus 
 │       ├── branding/
 │       │   ├── LogoMADV.svg      # Logo de la landing
 │       │   └── qr-landing-madv.svg # QR estático de la URL pública de la landing
-│       ├── gallery/              # 12 láminas .svg del recorrido visual:
+│       ├── gallery/              # 14 láminas .svg del recorrido visual:
 │       │                         # Titulo, Contexto1, Contexto2, Objetivos,
-│       │                         # Problemas, Propuesta, Roadmap, Usuario,
-│       │                         # Entornos, EntornoEsp, ArbolProb, ArbustoProb
+│       │                         # Problemas, Metodologia, Testeos y desarrollo,
+│       │                         # Propuesta, Roadmap, Usuario, Entornos,
+│       │                         # EntornoEsp, ArbolProb, ArbustoProb
 │       └── projects/             # Arte conceptual de las tarjetas de proyecto
 │           ├── StewartCard.svg
 │           ├── BTWCard.svg
@@ -60,6 +61,7 @@ Aplicación web para explorar proyectos de videojuegos, revisar su avance y sus 
     │   ├── instagram/
     │   │   └── InstagramPostCard.tsx # SocialCard con el post real de virtual:instagram-post y enlace al post
     │   ├── common/
+    │   │   ├── AngleIcon.tsx       # Chevrón angular reutilizable para navegación y botones
     │   │   ├── ArtPlaceholder.tsx # Arte conceptual decorativo con color por proyecto
     │   │   ├── LandingPopup.tsx   # Capa inicial de presentación (preparada, aún sin montar)
     │   │   ├── ScrollExpand.tsx   # Marco visual que se expande con el scroll de la landing
@@ -74,6 +76,7 @@ Aplicación web para explorar proyectos de videojuegos, revisar su avance y sus 
     │       └── ProjectCard.tsx    # Tarjeta de proyecto en el repositorio
     ├── component/
     │   └── DepthCarousel.tsx      # Carrusel de profundidad reutilizado en la galería
+    │   └── ScrambledText.tsx     # Texto scramble: entrada automatica + reaccion solo a click/tap (hover desactivado, pensado para movil)
     ├── constants/
     │   └── styles.ts             # Tokens TypeScript y clases tipográficas comunes
     ├── services/
@@ -88,7 +91,7 @@ Aplicación web para explorar proyectos de videojuegos, revisar su avance y sus 
     │   └── projects.ts           # Catálogo local de proyectos y contenido asociado
     ├── pages/
     │   ├── LandingPage.tsx      # Portada y resumen de MADV
-    │   ├── GalleryPage.tsx      # Carrusel de 12 imágenes, descripciones y visor 16:9
+    │       ├── GalleryPage.tsx      # Carrusel de 14 imágenes, descripciones y visor 16:9
     │   ├── EventsPage.tsx       # Página "Eventos": lugar de GDD, siguiente evento y post real de Instagram
     │   ├── FaqPage.tsx          # Página de preguntas frecuentes (?vista=faq), solo accesible desde el menú
     │   ├── RepositoryPage.tsx    # Listado de proyectos
@@ -103,7 +106,7 @@ Aplicación web para explorar proyectos de videojuegos, revisar su avance y sus 
 ## Navegación y vistas
 
 - `RepositoryPage` recorre `projects` y presenta una tarjeta por proyecto; cada tarjeta completa abre los detalles del proyecto y su botón de colaboración conserva el registro de clic. `ProjectCard` muestra las herramientas y las etiquetas con sus respectivos rótulos. Su identidad visual usa verdes eléctricos para diferenciar el catálogo de proyectos de la identidad amarilla de MADV. El encabezado comunica que son proyectos abiertos a colaboración (“Encuentra dónde aportar”) sin cambiar la navegación. “Volver a MADV” regresa a la portada y elimina `vista=repository` de la URL.
-- La raíz (`/`) muestra `LandingPage`; su logo principal es decorativo y no funciona como enlace. El CTA “Repositorio abierto” navega a `?vista=repository`; “Saber más del proyecto” abre `?vista=gallery` y “Eventos” abre `?vista=events`.
+- La raíz (`/`) muestra `LandingPage`; su logo principal es decorativo y no funciona como enlace. El CTA “Repositorio abierto” navega a `?vista=repository`; “Saber más del proyecto” abre `?vista=gallery` y “Eventos” abre `?vista=events`. El bloque sobre la colaboración del GDD usa jerarquía editorial con una introducción semibold en cursiva y un segundo párrafo regular justificado. Ambos párrafos usan `ScrambledText` (efecto `lift`, con `clickBurst`) y reciben su tipografía por `className`; `@components/ScrambledText.css` no define margen, fuente ni tamaño para no anular las utilidades de Tailwind.
 - `EventsPage` (`?vista=events`) muestra el título “Eventos” en tamaño grande y un bloque con “¿Y en dónde puedo asistir a GDD?”, “Lugar: El salón nº 304 - CYT” y el encabezado “El siguiente evento es:”. Debajo, centrado, `InstagramPostCard` muestra el post configurado en `src/data/instagram-post.ts` como `SocialCard` (variante `instagram`, hasta 380 px, sin contador de likes mediante `showLikes={false}`, la única prop agregada al componente de DiMaac) y un botón oscuro de ancho completo “Ver publicación en Instagram” que abre el post en otra pestaña (ver “Publicación real de Instagram”). Si no hay enlace configurado, no se muestra ninguna tarjeta. La tarjeta usa `scheme="auto"`: sigue el modo claro u oscuro del sistema mediante la variante `dark:` predeterminada de Tailwind v4 (`prefers-color-scheme`), y sus animaciones GSAP se omiten con `prefers-reduced-motion: reduce`. Algunos textos internos del componente (“More options”, “View all … comments”) están en inglés porque vienen del registro de DiMaac; Me gusta/Guardar solo cambian el estado local. La flecha global regresa a la landing y elimina `vista` de la URL. La barra usa el fondo crema `#f6f3ea`. La vista no registra eventos de analítica. En `App.analytics.test.tsx`, `vi.mock("virtual:instagram-post")` provee un post de ejemplo.
 - `FaqPage` (`?vista=faq`) contiene las preguntas frecuentes con desplegables nativos (`details`/`summary`) sobre el fondo amarillo `#f0cb82`. Las preguntas viven en el arreglo `faqs` de `src/pages/FaqPage.tsx`. La landing no la enlaza; solo se llega desde el menú lateral (“Preguntas”) o por URL directa. La flecha global regresa a la landing y elimina `vista`. La vista no registra eventos de analítica.
 - `StaggeredMenu` ocupa el encabezado superior de todas las vistas y enlaza a Inicio, Proyectos, Sobre MADV, Eventos y Preguntas; el botón se desplaza con el contenido en lugar de permanecer fijo durante el scroll. También ofrece el Instagram de GDD (`@gdd_col`).
