@@ -20,10 +20,10 @@ export type InstagramPost = {
   avatar?: string
 }
 
-export type InstagramPostResult =
-  | { status: "empty" }
-  | { status: "ok"; post: InstagramPost }
-  | { status: "error"; url: string | null; message: string }
+export type InstagramPostResult = { status: "empty" } | {
+  status: "ok"
+  post: InstagramPost
+} | { status: "error" url: string | null message: string }
 
 export type ParsedInstagramUrl = {
   kind: "p" | "reel" | "tv"
@@ -31,7 +31,11 @@ export type ParsedInstagramUrl = {
   canonicalUrl: string
 }
 
-const INSTAGRAM_HOSTS = new Set(["instagram.com", "www.instagram.com", "m.instagram.com"])
+const INSTAGRAM_HOSTS = new Set([
+  "instagram.com",
+  "www.instagram.com",
+  "m.instagram.com",
+])
 
 /** Acepta /p/<code>/, /reel/<code>/, /tv/<code>/ y la forma /<usuario>/p/<code>/. */
 export function parseInstagramPostUrl(raw: string): ParsedInstagramUrl | null {
@@ -42,11 +46,14 @@ export function parseInstagramPostUrl(raw: string): ParsedInstagramUrl | null {
     return null
   }
 
-  if (url.protocol !== "https:" || !INSTAGRAM_HOSTS.has(url.hostname)) return null
+  if (url.protocol !== "https:" || !INSTAGRAM_HOSTS.has(url.hostname))
+    return null
   if (url.username || url.password || url.port) return null
 
   const segments = url.pathname.split("/").filter(Boolean)
-  const kindIndex = segments.findIndex((segment) => ["p", "reel", "tv"].includes(segment))
+  const kindIndex = segments.findIndex((segment) =>
+    ["p", "reel", "tv"].includes(segment),
+  )
   if (kindIndex < 0 || kindIndex > 1) return null
 
   const kind = segments[kindIndex] as ParsedInstagramUrl["kind"]
@@ -71,18 +78,21 @@ export function decodeHtmlEntities(value: string): string {
     nbsp: "\u00a0",
   }
 
-  return value.replace(/&(#x[0-9a-f]+|#\d+|[a-z]+);/gi, (match, entity: string) => {
-    if (entity[0] === "#") {
-      const code =
-        entity[1] === "x" || entity[1] === "X"
-          ? Number.parseInt(entity.slice(2), 16)
-          : Number.parseInt(entity.slice(1), 10)
-      return Number.isFinite(code) && code >= 0 && code <= 0x10ffff
-        ? String.fromCodePoint(code)
-        : match
-    }
-    return named[entity.toLowerCase()] ?? match
-  })
+  return value.replace(
+    /&(#x[0-9a-f]+|#\d+|[a-z]+);/gi,
+    (match, entity: string) => {
+      if (entity[0] === "#") {
+        const code =
+          entity[1] === "x" || entity[1] === "X"
+            ? Number.parseInt(entity.slice(2), 16)
+            : Number.parseInt(entity.slice(1), 10)
+        return Number.isFinite(code) && code >= 0 && code <= 0x10ffff
+          ? String.fromCodePoint(code)
+          : match
+      }
+      return named[entity.toLowerCase()] ?? match
+    },
+  )
 }
 
 /** Lee las etiquetas <meta property|name="..." content="..."> sin importar el orden de atributos. */
@@ -101,8 +111,18 @@ export function readMetaTags(html: string): Map<string, string> {
 }
 
 const MONTHS = [
-  "january", "february", "march", "april", "may", "june",
-  "july", "august", "september", "october", "november", "december",
+  "january",
+  "february",
+  "march",
+  "april",
+  "may",
+  "june",
+  "july",
+  "august",
+  "september",
+  "october",
+  "november",
+  "december",
 ]
 
 function parseEnglishDate(value: string): string | null {
@@ -129,7 +149,8 @@ export function parseInstagramPostHtml(
   parsedUrl: ParsedInstagramUrl,
 ): InstagramPostMetadata | null {
   const meta = readMetaTags(html)
-  const description = meta.get("og:description") ?? meta.get("description") ?? ""
+  const description =
+    meta.get("og:description") ?? meta.get("description") ?? ""
   const title = meta.get("og:title") ?? ""
   const imageUrl = meta.get("og:image") ?? null
 
@@ -139,9 +160,10 @@ export function parseInstagramPostHtml(
     )
   const titled = /^([\s\S]*?) on Instagram: "([\s\S]*)"\s*$/.exec(title)
 
-  const usernameFromUrl = /instagram\.com\/([A-Za-z0-9._]{1,30})\/(?:p|reel|tv)\//.exec(
-    meta.get("og:url") ?? "",
-  )?.[1]
+  const usernameFromUrl =
+    /instagram\.com\/([A-Za-z0-9._]{1,30})\/(?:p|reel|tv)\//.exec(
+      meta.get("og:url") ?? "",
+    )?.[1]
 
   const username = described?.[1] ?? usernameFromUrl ?? null
   const caption = (described?.[3] ?? titled?.[2] ?? "").trim()
@@ -165,7 +187,8 @@ export function isAllowedInstagramImageUrl(raw: string): boolean {
     const url = new URL(raw)
     return (
       url.protocol === "https:" &&
-      (url.hostname.endsWith(".cdninstagram.com") || url.hostname.endsWith(".fbcdn.net"))
+      (url.hostname.endsWith(".cdninstagram.com") ||
+        url.hostname.endsWith(".fbcdn.net"))
     )
   } catch {
     return false

@@ -16,10 +16,10 @@ export default function LandingPage({
   onOpenEvents: () => void
 }) {
   return (
-    <main className="min-h-[100dvh] bg-[#f6f3ea] text-[#171827]">
-      <section className="bg-[#f0cb82] px-5 sm:px-8 lg:px-10">
+    <main className="min-h-[100dvh] bg-crema text-tinta">
+      <section className="bg-oro px-5 sm:px-8 lg:px-10">
         <div className="mx-auto max-w-[1120px]">
-          <header className="flex min-h-[180px] flex-col items-center justify-center gap-3 border-b border-[#363636]/20 py-6 sm:min-h-[156px]">
+          <header className="flex min-h-[180px] flex-col items-center justify-center gap-3 border-b border-tinta-suave/20 py-6 sm:min-h-[156px]">
             <div className="flex justify-center">
               <img
                 src={`${import.meta.env.BASE_URL}assets/branding/LogoMADV.svg`}
@@ -33,13 +33,13 @@ export default function LandingPage({
 
           <div className="flex min-h-[560px] flex-col justify-center py-16 sm:min-h-[600px] sm:py-20">
             <h1
-              className={`${semi} mt-5 max-w-[900px] text-[42px] leading-[1.04] text-[#171827] sm:text-[56px]`}
+              className={`${semi} mt-5 max-w-[900px] text-[42px] leading-[1.04] text-tinta sm:text-[56px]`}
             >
               Un repositorio abierto para que los proyectos de videojuegos
               encuentren nuevas manos.
             </h1>
             <p
-              className={`${reg} mt-6 max-w-[620px] text-[15px] leading-[1.65] text-[#4f4e59] sm:text-[17px]`}
+              className={`${reg} mt-6 max-w-[620px] text-[15px] leading-[1.65] text-grafito sm:text-[17px]`}
             >
               Descubre qué están creando otros equipos, conoce sus necesidades y
               encuentra una forma concreta de colaborar.
@@ -50,7 +50,7 @@ export default function LandingPage({
                 type="button"
                 onClick={onOpenRepository}
                 aria-label="Repositorio abierto"
-                className={`${semi} inline-flex min-h-12 items-center justify-center gap-3 rounded-[1px] bg-[#171827] px-5 text-[13px] text-white transition hover:bg-[#287b86] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#171827]`}
+                className={`${semi} inline-flex min-h-12 items-center justify-center gap-3 rounded-[1px] bg-tinta px-5 text-[13px] text-white transition hover:bg-turquesa focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-tinta`}
               >
                 Repositorio abierto
                 <AngleIcon className="size-4" />
@@ -58,7 +58,7 @@ export default function LandingPage({
               <button
                 type="button"
                 onClick={onOpenGallery}
-                className={`${semi} inline-flex min-h-12 items-center justify-center gap-3 rounded-[1px] border border-[#363636]/35 px-5 text-[13px] text-[#171827] transition hover:bg-white/45 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#171827]`}
+                className={`${semi} inline-flex min-h-12 items-center justify-center gap-3 rounded-[1px] border border-tinta-suave/35 px-5 text-[13px] text-tinta transition hover:bg-white/45 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-tinta`}
               >
                 Saber más del proyecto
                 <AngleIcon direction="down" className="size-4" />
@@ -66,7 +66,7 @@ export default function LandingPage({
               <button
                 type="button"
                 onClick={onOpenEvents}
-                className={`${semi} inline-flex min-h-12 items-center justify-center gap-3 rounded-[1px] border border-[#363636]/35 px-5 text-[13px] text-[#171827] transition hover:bg-white/45 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#171827]`}
+                className={`${semi} inline-flex min-h-12 items-center justify-center gap-3 rounded-[1px] border border-tinta-suave/35 px-5 text-[13px] text-tinta transition hover:bg-white/45 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-tinta`}
               >
                 Eventos
                 <AngleIcon className="size-4" />
@@ -77,7 +77,7 @@ export default function LandingPage({
       </section>
 
       <section
-        className="bg-[#171827] px-5 sm:px-8 lg:px-10"
+        className="bg-tinta px-5 sm:px-8 lg:px-10"
         aria-label="Presentación visual de MADV"
       >
         <ScrollExpand
@@ -106,19 +106,19 @@ export default function LandingPage({
         className="scroll-mt-8 px-5 py-16 sm:px-8 sm:py-20 lg:px-10"
       >
         <div className="mx-auto max-w-[1120px]">
-          <div className="grid gap-6 border-b border-[#171827]/15 pb-10 lg:grid-cols-[0.9fr_1.1fr] lg:gap-12">
+          <div className="grid gap-6 border-b border-tinta/15 pb-10 lg:grid-cols-[0.9fr_1.1fr] lg:gap-12">
             <div>
-              <p className={`${semi} text-[11px] uppercase text-[#d9533f]`}>
+              <p className={`${semi} text-[11px] uppercase text-coral`}>
                 Que implica el proyecto de "Más Allá del videojuego"
               </p>
               <h2
-                className={`${semi} mt-3 max-w-[520px] text-[30px] leading-[1.12] text-[#171827] sm:text-[38px]`}
+                className={`${semi} mt-3 max-w-[520px] text-[30px] leading-[1.12] text-tinta sm:text-[38px]`}
               >
                 Un punto de encuentro para crear en comunidad.
               </h2>
             </div>
             <p
-              className={`${reg} max-w-[620px] self-end text-[24px] leading-[1.7] text-[#4f4e59]`}
+              className={`${reg} max-w-[620px] self-end text-[24px] leading-[1.7] text-grafito`}
             >
               MADV reúne proyectos de videojuegos en distintas etapas con
               personas que quieren aportar sus habilidades. Cada ficha muestra
@@ -127,7 +127,7 @@ export default function LandingPage({
             </p>
           </div>
           <div className="mt-10">
-            <div className="h-[240px] overflow-hidden rounded-[2px] bg-[#171827] sm:h-[360px]">
+            <div className="h-[240px] overflow-hidden rounded-[2px] bg-tinta sm:h-[360px]">
               <HalftoneReveal
                 src={`${import.meta.env.BASE_URL}assets/branding/ColabLogo.jpg`}
                 fit="contain"
@@ -144,7 +144,7 @@ export default function LandingPage({
               />
             </div>
             <h3
-              className={`${semi} mt-6 max-w-[760px] text-[24px] leading-[1.2] text-[#171827] sm:text-[32px]`}
+              className={`${semi} mt-6 max-w-[760px] text-[24px] leading-[1.2] text-tinta sm:text-[32px]`}
             >
               Una comunidad que crece cuando compartimos lo que sabemos.
             </h3>
@@ -157,7 +157,7 @@ export default function LandingPage({
                 scrambleColor="#b7ff3c"
                 effect="lift"
                 clickBurst={true}
-                className={`${semi} text-[17px] italic leading-[1.45] text-[#171827] sm:text-[22px]`}
+                className={`${semi} text-[17px] italic leading-[1.45] text-tinta sm:text-[22px]`}
               >
                 La colaboración con el Grupo de Desarrolladores y Diseñadores
                 (GDD) fue fundamental para el desarrollo de la investigación de
@@ -171,7 +171,7 @@ export default function LandingPage({
                 scrambleColor="#b7ff3c"
                 effect="lift"
                 clickBurst={true}
-                className={`${reg} mt-4 text-[15px] leading-[1.7] text-[#4f4e59] sm:text-[15px]`}
+                className={`${reg} mt-4 text-[15px] leading-[1.7] text-grafito sm:text-[15px]`}
               >
                 Su participación permitió acceder al contexto real de estudio,
                 conocer las dinámicas de trabajo de los equipos, recopilar

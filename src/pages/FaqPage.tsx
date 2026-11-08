@@ -52,28 +52,28 @@ const faqs = [
 
 export default function FaqPage() {
   return (
-    <main className="min-h-[100dvh] w-full bg-[#f0cb82] px-5 pb-16 pt-10 text-[#171827] sm:px-8 sm:pt-14 lg:px-10 lg:pb-20">
+    <main className="min-h-[100dvh] w-full bg-oro px-5 pb-16 pt-10 text-tinta sm:px-8 sm:pt-14 lg:px-10 lg:pb-20">
       <div className="mx-auto max-w-[1120px]">
         <div className="grid gap-8 lg:grid-cols-[0.8fr_1.2fr] lg:gap-16">
           <div>
-            <p className={`${semi} text-[11px] uppercase text-[#d9533f]`}>
+            <p className={`${semi} text-[11px] uppercase text-coral`}>
               Preguntas frecuentes
             </p>
             <h1
-              className={`${semi} mt-3 max-w-[420px] text-[30px] leading-[1.12] text-[#171827] sm:text-[38px]`}
+              className={`${semi} mt-3 max-w-[420px] text-[30px] leading-[1.12] text-tinta sm:text-[38px]`}
             >
               Todo lo que necesitas saber para participar.
             </h1>
           </div>
 
-          <div className="border-t border-[#171827]/25">
+          <div className="border-t border-tinta/25">
             {faqs.map((faq) => (
               <details
                 key={faq.question}
-                className="group border-b border-[#171827]/25"
+                className="group border-b border-tinta/25"
               >
                 <summary
-                  className={`${semi} flex cursor-pointer list-none items-center justify-between gap-6 py-5 text-[16px] leading-[1.35] text-[#171827] marker:hidden focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#171827] [&::-webkit-details-marker]:hidden`}
+                  className={`${semi} flex cursor-pointer list-none items-center justify-between gap-6 py-5 text-[16px] leading-[1.35] text-tinta marker:hidden focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-tinta [&::-webkit-details-marker]:hidden`}
                 >
                   {faq.question}
                   <span
@@ -84,7 +84,7 @@ export default function FaqPage() {
                   </span>
                 </summary>
                 <p
-                  className={`${reg} max-w-[680px] pb-5 pr-10 text-[22px] leading-[1.7] text-[#4f4e59]`}
+                  className={`${reg} max-w-[680px] pb-5 pr-10 text-[22px] leading-[1.7] text-grafito`}
                 >
                   {faq.answer}
                 </p>

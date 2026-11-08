@@ -1,5 +1,37 @@
 @import "tailwindcss";
 
+/* Paleta de marca MADV. Cada token genera utilidades Tailwind (bg-*, text-*,
+   border-*, outline-*) y se reutiliza en el CSS global de abajo. */
+@theme {
+  --color-crema: #f6f3ea;
+  --color-tinta: #171827;
+  --color-tinta-suave: #363636;
+  --color-turquesa: #287b86;
+  --color-oro: #f0cb82;
+  --color-lima: #b7ff3c;
+  --color-grafito: #4f4e59;
+  --color-humo: #6b6a73;
+  --color-coral: #d9533f;
+  --color-musgo: #126b43;
+  --color-bosque: #10261c;
+  --color-menta: #eff8ee;
+  --color-menta-clara: #e5f3e3;
+  --color-menta-borde: #c7e8c5;
+  --color-lila: #e8def8;
+  --color-noche: #101116;
+  --color-pino: #244b38;
+  --color-salvia-borde: #d6ead2;
+  --color-perla: #e9e7df;
+  --color-coral-hover: #e5634d;
+  --color-plomo: #555555;
+  --color-eucalipto: #416451;
+  --color-menta-texto: #d9f1d4;
+  --color-lima-hover: #d0ff79;
+  --color-social-accion: #1d9bf0;
+  --color-social-repost: #00ba7c;
+  --color-social-like: #f91880;
+}
+
 @font-face {
   font-family: "Instrument Sans:Bold";
   src: url("https://static.figma.com/font/InstrumentSans_wdth_wght__1")
@@ -23,8 +55,8 @@
 }
 
 :root {
-  color: #171827;
-  background: #f6f3ea;
+  color: var(--color-tinta);
+  background: var(--color-crema);
   font-synthesis: none;
   text-rendering: optimizeLegibility;
 }
@@ -34,14 +66,14 @@
 }
 
 html {
-  background: #f6f3ea;
+  background: var(--color-crema);
 }
 
 body {
   min-width: 320px;
   min-height: 100dvh;
   margin: 0;
-  background: #f6f3ea;
+  background: var(--color-crema);
 }
 
 button {
@@ -50,7 +82,7 @@ button {
 
 ::selection {
   color: white;
-  background: #287b86;
+  background: var(--color-turquesa);
 }
 
 .project-art {

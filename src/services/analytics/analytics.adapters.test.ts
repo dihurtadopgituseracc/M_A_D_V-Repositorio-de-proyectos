@@ -116,9 +116,11 @@ describe("analytics adapters and service", () => {
   })
 
   it("calls the global fetch without rebinding it to the adapter", async () => {
-    const browserLikeFetch = vi.fn(function (this: unknown) {
+    const browserLikeFetch = vi.fn(function () {
       if (this !== undefined && this !== globalThis) {
-        throw new TypeError("Failed to execute 'fetch' on 'Window': Illegal invocation")
+        throw new TypeError(
+          "Failed to execute 'fetch' on 'Window': Illegal invocation",
+        )
       }
       return Promise.resolve(new Response(null, { status: 202 }))
     })
@@ -126,7 +128,9 @@ describe("analytics adapters and service", () => {
     vi.stubGlobal("fetch", browserLikeFetch)
 
     try {
-      await new ApiAnalyticsAdapter("https://analytics.example.test").send(event)
+      await new ApiAnalyticsAdapter("https://analytics.example.test").send(
+        event,
+      )
     } finally {
       vi.unstubAllGlobals()
     }

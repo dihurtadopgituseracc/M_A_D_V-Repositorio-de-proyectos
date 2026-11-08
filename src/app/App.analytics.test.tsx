@@ -53,6 +53,20 @@ async function renderApp(path = "/?vista=repository") {
       </StrictMode>,
     )
   })
+
+  await settleLazy()
+}
+
+// Las vistas se cargan con React.lazy; este ciclo deja que el import dinámico
+// resuelva y React vuelva a renderizar, hasta que el indicador de carga
+// (`data-page-loading`) desaparece del DOM.
+async function settleLazy() {
+  for (let i = 0; i < 50; i += 1) {
+    if (!container.querySelector("[data-page-loading]")) return
+    await act(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 0))
+    })
+  }
 }
 
 async function click(element: Element | null) {
@@ -63,6 +77,8 @@ async function click(element: Element | null) {
       new MouseEvent("click", { bubbles: true, cancelable: true }),
     )
   })
+
+  await settleLazy()
 }
 
 function buttonByLabel(start: string): HTMLButtonElement | null {

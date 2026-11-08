@@ -1,5 +1,7 @@
 "use client"
 
+// Hover desactivado: solo reaccionamos a click/tap (pensado para movil).
+
 import React, { useEffect, useLayoutEffect, useRef, useState } from "react"
 import { gsap } from "gsap"
 import { SplitText } from "gsap/SplitText"
@@ -421,8 +423,6 @@ const ScrambledText: React.FC<ScrambledTextProps> = ({
         measured = false
       })
       .catch(() => {})
-
-    // Hover desactivado: solo reaccionamos a click/tap (pensado para movil).
     root.addEventListener("pointerdown", handleDown)
 
     return () => {

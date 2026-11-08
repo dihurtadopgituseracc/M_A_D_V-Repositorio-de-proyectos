@@ -9,7 +9,7 @@ Aplicación web para explorar proyectos de videojuegos, revisar su avance y sus 
 1. `index.html` define el documento, el título actual de pestaña (`Proyectos abiertos | MADV`) y carga `src/main.tsx` dentro de `#root`.
 2. `src/main.tsx` importa los estilos globales y monta React.
 3. `src/App.tsx` es una fachada que reexporta `src/app/App.tsx`.
-4. `src/app/App.tsx` decide qué vista mostrar: landing, galería, eventos, repositorio, detalle del proyecto o detalle de una solicitud.
+4. `src/app/App.tsx` decide qué vista mostrar. La landing se importa directamente; galería, eventos, repositorio, preguntas y detalles se cargan bajo demanda con `React.lazy` y `Suspense`.
 5. `src/data/projects.ts` proporciona los datos que consumen las vistas y componentes.
 6. `src/component/StaggeredMenu.tsx` presenta la navegación global fija y el enlace de Instagram de GDD en todas las vistas.
 
@@ -22,7 +22,7 @@ Aplicación web para explorar proyectos de videojuegos, revisar su avance y sus 
 ├── pnpm-lock.yaml                # Versiones fijadas por pnpm
 ├── .env.example                  # Variables de ejemplo para analítica local/API
 ├── tsconfig.json                 # Configuración TypeScript y alias @/*
-├── vite.config.ts                # Vite, React, Tailwind, Figma Make, alias y registro de visitas en dev
+├── vite.config.ts                # Vite, React, Tailwind, Figma Make, alias, registro de visitas en dev y manualChunks (react/gsap en chunks aparte)
 ├── vitest.config.ts              # Alias y configuración de pruebas
 ├── .mise.toml                    # Versiones de Node y pnpm
 ├── .gitignore                    # Excluye dependencias, builds, secretos y estado local
@@ -50,8 +50,8 @@ Aplicación web para explorar proyectos de videojuegos, revisar su avance y sus 
     ├── App.tsx                   # Fachada hacia app/App.tsx
     ├── index.css                 # Tailwind v4, kit de marca y estilos globales
     ├── app/
-    │   ├── App.tsx               # Selección de vista, navegación e instrumentación
-    │   └── App.analytics.test.tsx # Pruebas DOM de interacciones bajo StrictMode
+    │   ├── App.tsx               # Navegación, React.lazy/Suspense e instrumentación
+    │   └── App.analytics.test.tsx # Pruebas DOM; espera la resolución de vistas lazy
     ├── config/
     │   ├── environment.ts        # Selección segura del modo de analítica
     │   └── environment.test.ts   # Pruebas de configuración y valores por defecto
@@ -63,7 +63,7 @@ Aplicación web para explorar proyectos de videojuegos, revisar su avance y sus 
     │   ├── common/
     │   │   ├── AngleIcon.tsx       # Chevrón angular reutilizable para navegación y botones
     │   │   ├── ArtPlaceholder.tsx # Arte conceptual decorativo con color por proyecto
-    │   │   ├── LandingPopup.tsx   # Capa inicial de presentación (preparada, aún sin montar)
+    │   │   ├── PageLoading.tsx    # Indicador accesible durante imports React.lazy
     │   │   ├── ScrollExpand.tsx   # Marco visual que se expande con el scroll de la landing
     │   │   └── ScrollExpand.css  # Estilos del componente ScrollExpand
     │   │   ├── Progress.tsx       # Barra de avance accesible con relleno CSS
@@ -115,7 +115,7 @@ Aplicación web para explorar proyectos de videojuegos, revisar su avance y sus 
 - `GalleryPage` presenta `Titulo.svg`, `Contexto1.svg`, `Objetivos.svg`, `Problemas.svg`, `Roadmap.svg`, `Usuario.svg`, `Contexto2.svg`, `Entornos.svg`, `EntornoEsp.svg`, `Propuesta.svg`, `ArbolProb.svg` y `ArbustoProb.svg` desde `public/assets/gallery/` mediante `DepthCarousel`, sobre un fondo oscuro igual al carrusel y con tipografía clara. La descripción inferior cambia con la lámina activa y al tocar una tarjeta se abre el visor 16:9 a pantalla completa, con navegación, cierre y soporte de teclado; si un SVG no carga, se muestra su nombre como fallback.
 - La landing presenta una introducción de MADV y una lista breve de los proyectos existentes; las preguntas frecuentes están en `FaqPage`. Los contadores de proyectos y oportunidades se muestran en `RepositoryPage`, junto con el encabezado del catálogo. No añade proyectos ni modifica el catálogo.
 - La sección “Qué implica el proyecto…” incluye un `HalftoneReveal` interactivo con `ScrollBG.jpg` y un subtítulo sobre el crecimiento de la comunidad.
-- `LandingPopup` encapsula la futura capa inicial de presentación: usa `PopUp.svg` cuando ese recurso esté disponible, aparece una vez por sesión, escucha el primer toque/clic o Escape, activa un desvanecimiento de 450 ms y luego se desmonta. El componente aún no está montado en `LandingPage` y `public/assets/branding/PopUp.svg` todavía no existe; al agregarlos, la landing se mantiene debajo de la capa sin cambiar la navegación.
+- `LandingPopup` fue eliminado por no estar montado ni referenciado en ninguna parte del código.
 - La navegación entre landing, galería, eventos, repositorio, proyectos y necesidades cambia las vistas de forma instantánea, sin swipe ni slide horizontal.
 - `LandingPage` incluye `ScrollExpand` con `LogoMADV.jpg` como recurso visual. La animación usa el scroll de la ventana para expandir el marco, revelar el contenido y mantener la navegación existente sin dependencias externas.
 - Los recursos visuales se organizan en `public/assets/branding/`, `public/assets/gallery/` y `public/assets/projects/`. Se referencian desde la web anteponiendo `import.meta.env.BASE_URL` a `assets/<grupo>/<archivo>` para respetar la base de despliegue. El logo de MADV se encuentra en `public/assets/branding/LogoMADV.svg` y `LogoMADV.jpg`; `public/assets/branding/qr-landing-madv.svg` contiene el QR estático de `https://prototipo-de-app-de-proyectos.vercel.app/`, sin incorporarse a la interfaz; las 12 láminas están en `gallery/` y el arte de tarjetas en `projects/`. Los archivos conservan sus nombres originales.
@@ -254,14 +254,16 @@ Beast Card Clash se incorporó desde `Beast_Card_Clash_matriz_repositorio.xlsx` 
 ## Estilos y marca
 
 - El proyecto usa React 19, TypeScript, Vite 8 y Tailwind CSS v4.
-- `src/index.css` importa Tailwind y mantiene las fuentes Figma, colores globales y arte decorativo del prototipo.
-- `src/constants/styles.ts` exporta tokens TypeScript (`colors`, `typography`, `spacing`, `radii`, `shadows`, `motion`) y las clases compartidas `semi`, `reg`, `instr` y `wdth`. No todos los tokens están conectados actualmente a `index.css`; cambios de marca pueden requerir actualizar ambos y las clases Tailwind literales.
-- Las páginas y componentes todavía tienen valores Tailwind literales, por ejemplo `text-[#...]` y `rounded-[...]`. Cambiar un token no modifica automáticamente esos literales; migrarlos si se requiere consistencia global.
+- `src/index.css` importa Tailwind y define la paleta MADV mediante `@theme`. Los tokens generan utilidades semánticas como `bg-crema`, `text-tinta`, `bg-lima`, `text-turquesa` y sus variantes de borde, hover y opacidad.
+- `:root`, `html`, `body` y `::selection` consumen las mismas variables `--color-*`, por lo que los colores globales y las utilidades comparten una sola fuente.
+- `src/constants/styles.ts` exporta las clases tipográficas compartidas `semi`, `reg`, `instr` y `wdth`.
+- Las utilidades de color hex arbitrario se migraron a tokens. Los valores hex que permanecen en TypeScript son entradas directas de canvas, props configurables o datos dinámicos; no son clases Tailwind.
+- Los tamaños y radios específicos todavía usan valores arbitrarios (`text-[...]`, `rounded-[...]`) cuando el diseño los requiere.
 - Las fuentes se descargan desde Google Fonts, por lo que su carga depende de conexión externa.
 
 ## Configuración y herramientas
 
-- `vite.config.ts` configura React, Tailwind v4, plugins de Figma Make, el alias `@` hacia `src`, y el servidor de desarrollo. El puerto predeterminado es `8443`, configurable con `PORT`. `base` usa `FIGMA_PUBLIC_URL` cuando existe y `/` en caso contrario.
+- `vite.config.ts` configura React, Tailwind v4, plugins de Figma Make, el alias `@` hacia `src`, y el servidor de desarrollo. El puerto predeterminado es `8443`, configurable con `PORT`. `base` usa `FIGMA_PUBLIC_URL` cuando existe y `/` en caso contrario. `manualChunks` separa React y GSAP para mejorar caché; `React.lazy` genera además un chunk por vista secundaria. En la compilación validada, el chunk inicial de la aplicación es de aproximadamente 63.8 kB (22.8 kB gzip), frente a los 206 kB (100 kB gzip) previos al lazy-loading.
 - `.figma/make/site.json` configura metadatos de Figma Make, incluyendo descripción y directivas de indexación. El título visible actual está escrito directamente en `index.html`.
 - `tsconfig.json` activa TypeScript estricto y mapea `@/*` a `src/*`.
 - `.mise.toml` declara Node 22 y pnpm 10.34.3.

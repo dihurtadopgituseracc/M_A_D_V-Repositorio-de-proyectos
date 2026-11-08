@@ -1,14 +1,23 @@
 import { defineConfig, type HtmlTagDescriptor, type Plugin } from "vite"
+
 import react from "@vitejs/plugin-react"
+
 import tailwindcss from "@tailwindcss/vite"
+
 import path from "node:path"
+
 import { appendFile, mkdir, readFile } from "node:fs/promises"
+
 import type { IncomingMessage, ServerResponse } from "node:http"
 
 import type * as VisitsReportModule from "./src/services/analytics/visits-report"
+
 import type * as AnalyticsTypesModule from "./src/services/analytics/analytics.types"
+
 import type * as ProjectsModule from "./src/data/projects"
+
 import { instagramPostUrl } from "./src/data/instagram-post"
+
 import {
   isAllowedInstagramImageUrl,
   parseInstagramPostHtml,
@@ -20,43 +29,78 @@ import {
 import siteConfiguration from "./.figma/make/site.json"
 
 // Vite config — https://vitejs.dev/config/
+
 export default defineConfig(({ mode }) => {
   // .figma/make/deploy-preview passes `--mode development` for cached-preview builds.
+
   const emitSourcemaps = mode === "development"
 
   return {
     base: process.env.FIGMA_PUBLIC_URL
       ? `${process.env.FIGMA_PUBLIC_URL}/`
       : "/",
+
     build: {
       sourcemap: emitSourcemaps ? "inline" : false,
+
       minify: !emitSourcemaps,
+
+      rollupOptions: {
+        output: {
+          // Aislar dependencias grandes y estables en chunks propios para que
+
+          // el navegador las cachee entre despliegues y las descargue en paralelo.
+
+          manualChunks(id: string) {
+            if (id.includes("node_modules")) {
+              if (id.includes("gsap")) return "gsap"
+
+              if (id.includes("react")) return "react"
+            }
+          },
+        },
+      },
     },
+
     plugins: [
       react(),
+
       tailwindcss(),
+
       figmaSiteConfiguration(siteConfiguration),
+
       figmaErrorOverlayReplay(),
+
       figmaReactRefreshBoundaryFallback(),
+
       figmaMakeKitPlugin({ storiesGlob: "/src/**/*.stories.{ts,tsx,js,jsx}" }),
+
       visitsDashboardPlugin(),
+
       instagramPostPlugin(instagramPostUrl),
     ],
+
     resolve: {
       alias: {
         "@": path.resolve(__dirname, "./src"),
       },
     },
+
     server: {
       host: process.env.FIGMA_DEV_SERVER_HOST || "0.0.0.0",
+
       port: parseInt(process.env.PORT || "8443"),
+
       strictPort: true,
+
       watch: {
         ignored: ["**/.figma/**", "**/.data/**"],
       },
     },
+
     preview: {
       host: process.env.FIGMA_DEV_SERVER_HOST || "0.0.0.0",
+
       port: parseInt(process.env.PORT || "8443"),
     },
   }
@@ -64,151 +108,219 @@ export default defineConfig(({ mode }) => {
 
 type FigmaSiteConfiguration = {
   title?: string
+
   description?: string
+
   language?: string
+
   robots?: {
     index?: boolean
   }
+
   icons?: {
     icon?: string
   }
+
   openGraph?: {
     image?: string
   }
+
   analytics?: {
     googleAnalyticsId?: string
   }
+
   customScripts?: {
     headStart?: string
+
     headEnd?: string
+
     bodyStart?: string
+
     bodyEnd?: string
   }
+
   accessibility?: {
     addBypassLinks?: boolean
   }
 }
 
 /** Applies /.figma/make/site.json to the generated document shell. */
+
 function figmaSiteConfiguration(config: FigmaSiteConfiguration): Plugin {
   function sanitizeHtmlValue(value: string | undefined): string {
     return value?.replace(/[^a-zA-Z0-9_-]/g, "") || ""
   }
+
   function escapeHtmlText(value: string): string {
     return value
+
       .replace(/&/g, "&amp;")
+
       .replace(/</g, "&lt;")
+
       .replace(/>/g, "&gt;")
   }
+
   function replaceHtmlCommentSlot(
     html: string,
+
     slotName: string,
+
     content: string,
   ): string {
     return html.replace(`<!-- ${slotName} -->`, content)
   }
 
   const title = config.title ?? "Figma Make App"
+
   const description = config.description ?? ""
+
   const favicon = config.icons?.icon ?? ""
+
   const socialImage = config.openGraph?.image ?? ""
+
   const language = sanitizeHtmlValue(config.language) || "en"
+
   const googleAnalyticsId = sanitizeHtmlValue(
     config.analytics?.googleAnalyticsId,
   )
+
   const headStart = config.customScripts?.headStart ?? ""
+
   const headEnd = config.customScripts?.headEnd ?? ""
+
   const bodyStart = config.customScripts?.bodyStart ?? ""
+
   const bodyEnd = config.customScripts?.bodyEnd ?? ""
+
   const robotsTxt =
     config.robots?.index === false ? "User-agent: *\nDisallow: /\n" : ""
 
   return {
     name: "figma-site-configuration",
+
     configureServer(server) {
       server.middlewares.use((req, res, next) => {
         if (!robotsTxt || req.url?.split("?")[0] !== "/robots.txt")
           return next()
 
         res.setHeader("Content-Type", "text/plain; charset=utf-8")
+
         res.end(robotsTxt)
       })
     },
+
     generateBundle() {
       if (!robotsTxt) return
 
       this.emitFile({
         type: "asset",
+
         fileName: "robots.txt",
+
         source: robotsTxt,
       })
     },
+
     transformIndexHtml: {
       order: "pre",
+
       handler(html) {
         let result = html
+
         result = replaceHtmlCommentSlot(result, "figma:lang", language)
+
         result = replaceHtmlCommentSlot(
           result,
+
           "figma:title",
+
           escapeHtmlText(title),
         )
+
         result = replaceHtmlCommentSlot(result, "figma:head-start", headStart)
+
         result = replaceHtmlCommentSlot(result, "figma:head-end", headEnd)
+
         result = replaceHtmlCommentSlot(result, "figma:body-start", bodyStart)
+
         result = replaceHtmlCommentSlot(result, "figma:body-end", bodyEnd)
 
         const tags: HtmlTagDescriptor[] = []
+
         if (description) {
           tags.push({
             tag: "meta",
+
             attrs: { name: "description", content: description },
+
             injectTo: "head",
           })
         }
+
         if (config.robots?.index === false) {
           tags.push({
             tag: "meta",
+
             attrs: { name: "robots", content: "noindex, nofollow" },
+
             injectTo: "head",
           })
         }
+
         if (favicon) {
           tags.push({
             tag: "link",
+
             attrs: { rel: "icon", href: favicon },
+
             injectTo: "head",
           })
         }
+
         if (title) {
           tags.push({
             tag: "meta",
+
             attrs: { property: "og:title", content: title },
+
             injectTo: "head",
           })
         }
+
         if (description) {
           tags.push({
             tag: "meta",
+
             attrs: { property: "og:description", content: description },
+
             injectTo: "head",
           })
         }
+
         if (socialImage) {
           tags.push(
             {
               tag: "meta",
+
               attrs: { property: "og:image", content: socialImage },
+
               injectTo: "head",
             },
+
             {
               tag: "meta",
+
               attrs: { name: "twitter:card", content: "summary_large_image" },
+
               injectTo: "head",
             },
+
             {
               tag: "meta",
+
               attrs: { name: "twitter:image", content: socialImage },
+
               injectTo: "head",
             },
           )
@@ -218,20 +330,26 @@ function figmaSiteConfiguration(config: FigmaSiteConfiguration): Plugin {
           tags.push(
             {
               tag: "script",
+
               attrs: {
                 async: true,
+
                 src: `https://www.googletagmanager.com/gtag/js?id=${googleAnalyticsId}`,
               },
+
               injectTo: "head",
             },
+
             {
               tag: "script",
+
               children: `
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
   gtag('js', new Date());
   gtag('config', ${JSON.stringify(googleAnalyticsId)});
 `,
+
               injectTo: "head",
             },
           )
@@ -241,6 +359,7 @@ function figmaSiteConfiguration(config: FigmaSiteConfiguration): Plugin {
           tags.push(
             {
               tag: "style",
+
               children: `
   .figma-bypass-link {
     position: fixed;
@@ -259,12 +378,17 @@ function figmaSiteConfiguration(config: FigmaSiteConfiguration): Plugin {
     transform: translateY(0);
   }
 `,
+
               injectTo: "head",
             },
+
             {
               tag: "a",
+
               attrs: { class: "figma-bypass-link", href: "#root" },
+
               children: "Skip to content",
+
               injectTo: "body-prepend",
             },
           )
@@ -272,6 +396,7 @@ function figmaSiteConfiguration(config: FigmaSiteConfiguration): Plugin {
 
         return {
           html: result,
+
           tags,
         }
       },
@@ -292,26 +417,33 @@ function figmaSiteConfiguration(config: FigmaSiteConfiguration): Plugin {
  * `update` or `full-reload` so a stale overlay can't survive a
  * fixed build.
  */
+
 function figmaErrorOverlayReplay(): Plugin {
   return {
     name: "figma-error-overlay-replay",
+
     apply: "serve",
+
     configureServer(server) {
       let lastError: object | null = null
 
       const origSend = server.ws.send.bind(server.ws) as (
         ...args: any[]
       ) => void
+
       server.ws.send = (((...args: any[]) => {
         const payload = args[0]
+
         if (payload && typeof payload === "object" && !Array.isArray(payload)) {
           const type = (payload as { type?: string }).type
+
           if (type === "error") {
             lastError = (payload as object)
           } else if (type === "update" || type === "full-reload") {
             lastError = null
           }
         }
+
         return origSend(...args)
       }) as typeof server.ws.send)
 
@@ -336,24 +468,33 @@ function figmaErrorOverlayReplay(): Plugin {
  * mounted component family. React reports a successful refresh while leaving
  * the old tree mounted until the page is reloaded.
  */
+
 function figmaReactRefreshBoundaryFallback(): Plugin {
   const hadRefreshBoundary = new Map<string, boolean>()
+
   let sendFullReload: (() => void) | null = null
 
   return {
     name: "figma-react-refresh-boundary-fallback",
+
     apply: "serve",
+
     enforce: "post",
+
     configureServer(server) {
       sendFullReload = () => server.ws.send({ type: "full-reload", path: "*" })
     },
+
     transform(code, id) {
       if (!/\.[jt]sx?(?:\?|$)/.test(id) || id.includes("/node_modules/"))
         return null
 
       const moduleId = id.split("?")[0] ?? id
+
       const hasRefreshBoundary = code.includes("registerExportsForReactRefresh")
+
       const previousHadRefreshBoundary = hadRefreshBoundary.get(moduleId)
+
       hadRefreshBoundary.set(moduleId, hasRefreshBoundary)
 
       if (previousHadRefreshBoundary && !hasRefreshBoundary) {
@@ -376,16 +517,22 @@ function figmaReactRefreshBoundaryFallback(): Plugin {
  * builds (`vite build`) skip it entirely so the route doesn't leak
  * into shipped bundles.
  */
+
 function figmaMakeKitPlugin(options: {
   storiesGlob: string | string[]
 }): Plugin {
   const storiesGlob = Array.isArray(options.storiesGlob)
     ? options.storiesGlob
     : [options.storiesGlob]
+
   const ROUTE = "/.figma/make/kit.html"
+
   const VIRTUAL_ID = "virtual:figma-stories"
+
   const RESOLVED_ID = "\0" + VIRTUAL_ID
+
   const STORIES_MODULE = `export const stories = import.meta.glob(${JSON.stringify(storiesGlob)})`
+
   const HTML_BOOTSTRAP = `<!doctype html>
 <html lang="en">
 <head>
@@ -404,22 +551,30 @@ function figmaMakeKitPlugin(options: {
 
   return {
     name: "figma-make-kit",
+
     apply: "serve",
+
     resolveId(id) {
       if (id === VIRTUAL_ID) return RESOLVED_ID
+
       return null
     },
+
     load(id) {
       if (id !== RESOLVED_ID) return null
+
       return STORIES_MODULE
     },
+
     configureServer(server) {
       server.middlewares.use(async (req, res, next) => {
         const url = req.url || ""
+
         if (url.split("?")[0] !== ROUTE) return next()
 
         try {
           res.setHeader("Content-Type", "text/html")
+
           res.end(await server.transformIndexHtml(url, HTML_BOOTSTRAP))
         } catch (err) {
           next(err as Error)
@@ -428,7 +583,6 @@ function figmaMakeKitPlugin(options: {
     },
   }
 }
-
 
 /**
  * Registro de visitas mientras la página se sirve con el servidor de Vite.
@@ -439,6 +593,7 @@ function figmaMakeKitPlugin(options: {
  *
  * Solo existe en `vite` (dev). El build estático desplegado no incluye estas rutas.
  */
+
 function visitsDashboardPlugin(): Plugin {
   const MAX_BODY_BYTES = 4096
 
@@ -446,35 +601,54 @@ function visitsDashboardPlugin(): Plugin {
     return new Promise((resolve, reject) => {
       if (Number(req.headers["content-length"] ?? 0) > MAX_BODY_BYTES) {
         req.resume()
+
         resolve(null)
+
         return
       }
 
       let size = 0
+
       let tooLarge = false
+
       const chunks: Buffer[] = []
+
       req.on("data", (chunk: Buffer) => {
         size += chunk.length
+
         if (size > MAX_BODY_BYTES) tooLarge = true
+
         if (!tooLarge) chunks.push(chunk)
       })
+
       req.on("end", () =>
         resolve(tooLarge ? null : Buffer.concat(chunks).toString("utf8")),
       )
+
       req.on("error", reject)
     })
   }
 
-  function send(res: ServerResponse, status: number, body = "", type = "text/plain; charset=utf-8") {
+  function send(
+    res: ServerResponse,
+    status: number,
+    body = "",
+    type = "text/plain; charset=utf-8",
+  ) {
     res.statusCode = status
+
     res.setHeader("Content-Type", type)
+
     res.setHeader("Cache-Control", "no-store")
+
     res.end(body)
   }
 
   return {
     name: "madv-visits-dashboard",
+
     apply: "serve",
+
     configureServer(server) {
       const dataFile = path.resolve(server.config.root, ".data", "visits.jsonl")
 
@@ -482,9 +656,11 @@ function visitsDashboardPlugin(): Plugin {
         report: (await server.ssrLoadModule(
           "/src/services/analytics/visits-report.ts",
         )) as typeof VisitsReportModule,
+
         types: (await server.ssrLoadModule(
           "/src/services/analytics/analytics.types.ts",
         )) as typeof AnalyticsTypesModule,
+
         catalog: (await server.ssrLoadModule(
           "/src/data/projects.ts",
         )) as typeof ProjectsModule,
@@ -492,7 +668,9 @@ function visitsDashboardPlugin(): Plugin {
 
       server.middlewares.use(async (req, res, next) => {
         const pathname = (req.url ?? "").split("?")[0] ?? ""
+
         const isEvents = pathname.endsWith("/api/events")
+
         const isDashboard = /\/dashboard-visitas\/?$/.test(pathname)
 
         if (!isEvents && !isDashboard) return next()
@@ -501,6 +679,7 @@ function visitsDashboardPlugin(): Plugin {
           if (isEvents) {
             if (req.method !== "POST") {
               res.setHeader("Allow", "POST")
+
               return send(res, 405, "Method Not Allowed")
             }
 
@@ -509,9 +688,11 @@ function visitsDashboardPlugin(): Plugin {
             }
 
             const body = await readBody(req)
+
             if (body === null) return send(res, 413, "Payload Too Large")
 
             let payload: unknown
+
             try {
               payload = JSON.parse(body)
             } catch {
@@ -519,22 +700,32 @@ function visitsDashboardPlugin(): Plugin {
             }
 
             const { report, types } = await loadModules()
+
             if (!types.isAnalyticsEvent(payload)) {
               return send(res, 422, "Invalid analytics event")
             }
 
             await mkdir(path.dirname(dataFile), { recursive: true })
-            await appendFile(dataFile, report.toStoredLine(payload, new Date()), "utf8")
+
+            await appendFile(
+              dataFile,
+              report.toStoredLine(payload, new Date()),
+              "utf8",
+            )
+
             return send(res, 202)
           }
 
           if (req.method !== "GET" && req.method !== "HEAD") {
             res.setHeader("Allow", "GET, HEAD")
+
             return send(res, 405, "Method Not Allowed")
           }
 
           const { report, catalog } = await loadModules()
+
           let content = ""
+
           try {
             content = await readFile(dataFile, "utf8")
           } catch (error) {
@@ -542,13 +733,22 @@ function visitsDashboardPlugin(): Plugin {
           }
 
           const { events, skippedLines } = report.parseStoredEvents(content)
+
           const html = report.renderVisitsReportHtml(
             report.buildVisitsReport(events, catalog.projects, skippedLines),
           )
+
           res.setHeader("X-Robots-Tag", "noindex, nofollow")
-          return send(res, 200, req.method === "HEAD" ? "" : html, "text/html; charset=utf-8")
+
+          return send(
+            res,
+            200,
+            req.method === "HEAD" ? "" : html,
+            "text/html; charset=utf-8",
+          )
         } catch (error) {
           server.config.logger.error(`[visits] ${(error as Error).message}`)
+
           return send(res, 500, "Internal Server Error")
         }
       })
@@ -566,85 +766,145 @@ function visitsDashboardPlugin(): Plugin {
  * Así el navegador no hace peticiones a Instagram y el build estático funciona sin servidor.
  * Si algo falla, el módulo exporta `status: "error"` y la compilación continúa.
  */
+
 function instagramPostPlugin(rawUrl: string): Plugin {
   const VIRTUAL_ID = "virtual:instagram-post"
+
   const RESOLVED_ID = "\0" + VIRTUAL_ID
+
   const PREVIEW_USER_AGENT =
     "facebookexternalhit/1.1 (+http://www.facebook.com/externalhit_uatext.php)"
+
   const TIMEOUT_MS = 10_000
+
   const MAX_IMAGE_BYTES = 5 * 1024 * 1024
+
   let cached: Promise<InstagramPostResult> | null = null
 
   async function fetchText(url: string): Promise<string> {
     const response = await fetch(url, {
-      headers: { "User-Agent": PREVIEW_USER_AGENT, "Accept-Language": "en-US,en;q=0.8" },
+      headers: {
+        "User-Agent": PREVIEW_USER_AGENT,
+        "Accept-Language": "en-US,en;q=0.8",
+      },
+
       redirect: "follow",
+
       signal: AbortSignal.timeout(TIMEOUT_MS),
     })
-    if (!response.ok) throw new Error(`Instagram respondió HTTP ${response.status}`)
+
+    if (!response.ok)
+      throw new Error(`Instagram respondió HTTP ${response.status}`)
+
     const finalHost = new URL(response.url).hostname
+
     if (!finalHost.endsWith("instagram.com")) {
       throw new Error(`Instagram redirigió a ${finalHost}`)
     }
+
     return response.text()
   }
 
-  async function fetchImageAsDataUrl(url: string | null | undefined): Promise<string | null> {
+  async function fetchImageAsDataUrl(
+    url: string | null | undefined,
+  ): Promise<string | null> {
     if (!url || !isAllowedInstagramImageUrl(url)) return null
-    const response = await fetch(url, { signal: AbortSignal.timeout(TIMEOUT_MS) })
+
+    const response = await fetch(url, {
+      signal: AbortSignal.timeout(TIMEOUT_MS),
+    })
+
     const type = response.headers.get("content-type") ?? ""
-    if (!response.ok || !/^image\/(jpeg|png|webp|gif)$/.test(type.split(";")[0]!.trim())) {
+
+    if (
+      !response.ok ||
+      !/^image\/(jpeg|png|webp|gif)$/.test(type.split(";")[0]!.trim())
+    ) {
       return null
     }
+
     const bytes = Buffer.from(await response.arrayBuffer())
+
     if (bytes.length === 0 || bytes.length > MAX_IMAGE_BYTES) return null
+
     return `data:${type.split(";")[0]!.trim()};base64,${bytes.toString("base64")}`
   }
 
   async function load(): Promise<InstagramPostResult> {
     const url = rawUrl.trim()
+
     if (!url) return { status: "empty" }
 
     const parsedUrl = parseInstagramPostUrl(url)
+
     if (!parsedUrl) {
       return {
         status: "error",
+
         url: null,
+
         message:
           "El enlace no es un post público de Instagram (se espera https://www.instagram.com/p/<código>/).",
       }
     }
 
     try {
-      const metadata = parseInstagramPostHtml(await fetchText(parsedUrl.canonicalUrl), parsedUrl)
+      const metadata = parseInstagramPostHtml(
+        await fetchText(parsedUrl.canonicalUrl),
+        parsedUrl,
+      )
+
       if (!metadata) {
-        throw new Error("Instagram no devolvió los datos del post (¿es privado o fue borrado?)")
+        throw new Error(
+          "Instagram no devolvió los datos del post (¿es privado o fue borrado?)",
+        )
       }
 
-      const image = await fetchImageAsDataUrl(metadata.imageUrl).catch(() => null)
-      const avatar = await fetchText(`https://www.instagram.com/${metadata.username}/`)
+      const image = await fetchImageAsDataUrl(metadata.imageUrl).catch(
+        () => null,
+      )
+
+      const avatar = await fetchText(
+        `https://www.instagram.com/${metadata.username}/`,
+      )
+
         .then((html) => fetchImageAsDataUrl(readMetaTags(html).get("og:image")))
+
         .catch(() => null)
 
       const { imageUrl: _imageUrl, ...post } = metadata
-      return { status: "ok", post: { ...post, image, avatar: avatar ?? undefined } }
+
+      return {
+        status: "ok",
+        post: { ...post, image, avatar: avatar ?? undefined },
+      }
     } catch (error) {
-      return { status: "error", url: parsedUrl.canonicalUrl, message: (error as Error).message }
+      return {
+        status: "error",
+        url: parsedUrl.canonicalUrl,
+        message: (error as Error).message,
+      }
     }
   }
 
   return {
     name: "madv-instagram-post",
+
     resolveId(id) {
       return id === VIRTUAL_ID ? RESOLVED_ID : null
     },
+
     async load(id) {
       if (id !== RESOLVED_ID) return null
+
       cached ??= load()
+
       const result = await cached
+
       if (result.status === "error") {
         this.warn(`[instagram] ${result.message}`)
       }
+
       return `export default ${JSON.stringify(result)}`
     },
   }

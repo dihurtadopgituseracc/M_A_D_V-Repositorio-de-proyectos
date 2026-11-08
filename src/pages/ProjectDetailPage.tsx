@@ -137,17 +137,17 @@ export default function ProjectDetailPage({
   }
 
   return (
-    <main className="min-h-[100dvh] w-full bg-[#f6f3ea] px-3 pb-16 pt-4 sm:px-6 sm:pt-7 lg:px-10 lg:pb-20">
+    <main className="min-h-[100dvh] w-full bg-crema px-3 pb-16 pt-4 sm:px-6 sm:pt-7 lg:px-10 lg:pb-20">
       <div className="mx-auto max-w-[1120px]">
-        <div className="mt-3 flex flex-col justify-between gap-3 border-b border-[#171827]/10 pb-5 sm:flex-row sm:items-end">
+        <div className="mt-3 flex flex-col justify-between gap-3 border-b border-tinta/10 pb-5 sm:flex-row sm:items-end">
           <div>
             <p
-              className={`${semi} text-[10px] uppercase tracking-[0.16em] text-[#287b86]`}
+              className={`${semi} text-[10px] uppercase tracking-[0.16em] text-turquesa`}
             >
               {project.eyebrow}
             </p>
             <h1
-              className={`${semi} mt-2 text-[30px] tracking-[-0.02em] text-[#171827] sm:text-[40px]`}
+              className={`${semi} mt-2 text-[30px] tracking-[-0.02em] text-tinta sm:text-[40px]`}
             >
               {project.title}
             </h1>
@@ -166,52 +166,52 @@ export default function ProjectDetailPage({
               className="min-h-[230px] sm:min-h-[320px]"
             />
             <div className="px-2 pt-5 sm:px-3">
-              <h2 className={`${semi} text-[22px] text-[#171827]`}>
+              <h2 className={`${semi} text-[22px] text-tinta`}>
                 Proyecto en 6 líneas
               </h2>
               <p
-                className={`${reg} mt-3 max-w-[760px] text-pretty text-[13px] leading-[1.6] text-[#6b6a73]`}
+                className={`${reg} mt-3 max-w-[760px] text-pretty text-[13px] leading-[1.6] text-humo`}
               >
                 {project.summary}
               </p>
             </div>
           </div>
 
-          <aside className="h-fit rounded-[20px] border border-[#171827]/[0.04] bg-white p-5 shadow-[0_16px_40px_rgba(23,24,39,0.05)] sm:p-6 lg:sticky lg:top-6">
+          <aside className="h-fit rounded-[20px] border border-tinta/[0.04] bg-white p-5 shadow-[0_16px_40px_rgba(23,24,39,0.05)] sm:p-6 lg:sticky lg:top-6">
             <div className="grid grid-cols-2 gap-5 lg:grid-cols-1">
               <div>
                 <p
-                  className={`${semi} text-[10px] tracking-[0.12em] text-[#6b6a73]`}
+                  className={`${semi} text-[10px] tracking-[0.12em] text-humo`}
                 >
                   ETAPA ACTUAL
                 </p>
-                <p className={`${semi} mt-1 text-[16px] text-[#171827]`}>
+                <p className={`${semi} mt-1 text-[16px] text-tinta`}>
                   {project.stage}
                 </p>
               </div>
               <div>
                 <p
-                  className={`${semi} text-[10px] tracking-[0.12em] text-[#6b6a73]`}
+                  className={`${semi} text-[10px] tracking-[0.12em] text-humo`}
                 >
                   ESTADO ACTUAL
                 </p>
                 <p
-                  className={`${semi} mt-1 text-[15px] leading-snug text-[#171827]`}
+                  className={`${semi} mt-1 text-[15px] leading-snug text-tinta`}
                 >
                   {project.status}
                 </p>
               </div>
             </div>
 
-            <div className="mt-6 border-t border-[#171827]/10 pt-5">
+            <div className="mt-6 border-t border-tinta/10 pt-5">
               <div className="flex items-end justify-between gap-3">
-                <p className={`${reg} text-[12px] text-[#6b6a73]`}>
+                <p className={`${reg} text-[12px] text-humo`}>
                   {project.genre} ·{" "}
                   {project.team === null
                     ? "Equipo por confirmar"
                     : `${project.team} integrantes`}
                 </p>
-                <p className={`${semi} text-[22px] text-[#171827]`}>
+                <p className={`${semi} text-[22px] text-tinta`}>
                   {project.progress === null
                     ? "Por confirmar"
                     : `${project.progress}%`}
@@ -222,14 +222,14 @@ export default function ProjectDetailPage({
                   <Progress value={project.progress} />
                 </div>
               )}
-              <p className={`${reg} mt-2 text-[11px] text-[#6b6a73]`}>
+              <p className={`${reg} mt-2 text-[11px] text-humo`}>
                 {project.progress === null
                   ? "Avance general por confirmar con el equipo"
                   : "Avance general del proyecto"}
               </p>
             </div>
 
-            <div className="mt-6 border-t border-[#171827]/10 pt-5">
+            <div className="mt-6 border-t border-tinta/10 pt-5">
               <div className="flex items-center gap-4">
                 <div ref={qrContainerRef} className="shrink-0">
                   <QRCodeSVG
@@ -243,11 +243,11 @@ export default function ProjectDetailPage({
                   />
                 </div>
                 <div>
-                  <p className={`${semi} text-[12px] text-[#171827]`}>
+                  <p className={`${semi} text-[12px] text-tinta`}>
                     Compartir código QR
                   </p>
                   <p
-                    className={`${reg} mt-1 text-[11px] leading-[1.5] text-[#6b6a73]`}
+                    className={`${reg} mt-1 text-[11px] leading-[1.5] text-humo`}
                   >
                     Descarga o comparte la imagen para que otras personas puedan
                     abrir {project.shortTitle}.
@@ -258,14 +258,14 @@ export default function ProjectDetailPage({
                 <button
                   type="button"
                   onClick={shareQr}
-                  className={`${semi} min-h-10 rounded-full bg-[#171827] px-4 text-[11px] text-white transition hover:bg-[#287b86] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#287b86]`}
+                  className={`${semi} min-h-10 rounded-full bg-tinta px-4 text-[11px] text-white transition hover:bg-turquesa focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-turquesa`}
                 >
                   Compartir QR
                 </button>
                 <button
                   type="button"
                   onClick={downloadQr}
-                  className={`${semi} min-h-10 rounded-full border border-[#171827]/20 px-4 text-[11px] text-[#171827] transition hover:bg-[#f6f3ea] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#287b86]`}
+                  className={`${semi} min-h-10 rounded-full border border-tinta/20 px-4 text-[11px] text-tinta transition hover:bg-crema focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-turquesa`}
                 >
                   Descargar PNG
                 </button>
@@ -273,7 +273,7 @@ export default function ProjectDetailPage({
               {qrMessage && (
                 <p
                   role="status"
-                  className={`${reg} mt-3 text-[11px] leading-[1.5] text-[#287b86]`}
+                  className={`${reg} mt-3 text-[11px] leading-[1.5] text-turquesa`}
                 >
                   {qrMessage}
                 </p>
@@ -285,11 +285,11 @@ export default function ProjectDetailPage({
         <section className="mt-10 grid gap-9 lg:grid-cols-[0.75fr_1.25fr] lg:gap-7">
           <div>
             <p
-              className={`${semi} text-[10px] uppercase tracking-[0.16em] text-[#d9533f]`}
+              className={`${semi} text-[10px] uppercase tracking-[0.16em] text-coral`}
             >
               Flujo de trabajo
             </p>
-            <h2 className={`${semi} mt-2 text-[22px] text-[#171827]`}>
+            <h2 className={`${semi} mt-2 text-[22px] text-tinta`}>
               Herramientas
             </h2>
             <div className="mt-4 flex flex-col gap-3">
@@ -301,7 +301,7 @@ export default function ProjectDetailPage({
 
           <div>
             <p
-              className={`${semi} text-[10px] uppercase tracking-[0.16em] text-[#d9533f]`}
+              className={`${semi} text-[10px] uppercase tracking-[0.16em] text-coral`}
             >
               {confirmedNeeds.length > 0
                 ? "Colaboraciones abiertas"
@@ -309,13 +309,13 @@ export default function ProjectDetailPage({
                   ? "Propuestas por confirmar"
                   : "Colaboraciones"}
             </p>
-            <h2 className={`${semi} mt-2 text-[22px] text-[#171827]`}>
+            <h2 className={`${semi} mt-2 text-[22px] text-tinta`}>
               ¿Qué necesita el proyecto?
             </h2>
             {project.needs.length > 0 ? (
               <>
                 {hasProposedNeeds && (
-                  <p className={`${reg} mt-3 text-[13px] text-[#6b6a73]`}>
+                  <p className={`${reg} mt-3 text-[13px] text-humo`}>
                     Propuestas basadas en la matriz; el equipo debe confirmar su
                     vigencia y alcance.
                   </p>
@@ -335,7 +335,7 @@ export default function ProjectDetailPage({
                 </div>
               </>
             ) : (
-              <p className={`${reg} mt-3 text-[13px] text-[#6b6a73]`}>
+              <p className={`${reg} mt-3 text-[13px] text-humo`}>
                 Las tareas abiertas y el tipo de apoyo están por confirmar con
                 el equipo.
               </p>
@@ -345,7 +345,7 @@ export default function ProjectDetailPage({
 
         {confirmedNeeds.length > 0 ? (
           <section
-            className="mt-10 flex flex-col justify-between gap-5 rounded-[22px] bg-[#171827] px-6 py-6 sm:flex-row sm:items-center sm:px-8"
+            className="mt-10 flex flex-col justify-between gap-5 rounded-[22px] bg-tinta px-6 py-6 sm:flex-row sm:items-center sm:px-8"
             aria-live="polite"
           >
             <div>
@@ -354,7 +354,7 @@ export default function ProjectDetailPage({
                   ? "Tu interés quedó registrado"
                   : "¿Tu perfil encaja con el proyecto?"}
               </p>
-              <p className={`${reg} mt-1 text-[12px] text-[#e9e7df]`}>
+              <p className={`${reg} mt-1 text-[12px] text-perla`}>
                 {interestSent
                   ? `El equipo de ${project.title} ya puede revisar tu solicitud.`
                   : "Comparte tu interés y el equipo podrá ponerse en contacto."}
@@ -369,28 +369,28 @@ export default function ProjectDetailPage({
               className={`${semi} min-h-11 rounded-[9px] px-5 text-[12px] transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white ${
                 interestSent
                   ? "cursor-default bg-white/15 text-white"
-                  : "bg-[#d9533f] text-[#171827] hover:bg-[#e5634d] active:scale-95"
+                  : "bg-coral text-tinta hover:bg-coral-hover active:scale-95"
               }`}
             >
               {interestSent ? "INTERÉS REGISTRADO" : "MOSTRAR INTERÉS"}
             </button>
           </section>
         ) : hasProposedNeeds ? (
-          <section className="mt-10 rounded-[22px] bg-[#171827] px-6 py-6 sm:px-8">
+          <section className="mt-10 rounded-[22px] bg-tinta px-6 py-6 sm:px-8">
             <p className={`${semi} text-[18px] text-white`}>
               Propuestas por confirmar
             </p>
-            <p className={`${reg} mt-1 text-[12px] text-[#e9e7df]`}>
+            <p className={`${reg} mt-1 text-[12px] text-perla`}>
               Estas ideas no son vacantes confirmadas. El equipo debe validar
               las necesidades antes de abrir colaboraciones.
             </p>
           </section>
         ) : (
-          <section className="mt-10 rounded-[22px] bg-[#171827] px-6 py-6 sm:px-8">
+          <section className="mt-10 rounded-[22px] bg-tinta px-6 py-6 sm:px-8">
             <p className={`${semi} text-[18px] text-white`}>
               Oportunidad de colaboración por confirmar
             </p>
-            <p className={`${reg} mt-1 text-[12px] text-[#e9e7df]`}>
+            <p className={`${reg} mt-1 text-[12px] text-perla`}>
               El equipo aún debe confirmar qué tareas están abiertas y qué tipo
               de apoyo necesita.
             </p>

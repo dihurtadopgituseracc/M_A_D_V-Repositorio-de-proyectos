@@ -9,9 +9,9 @@ export type VisitsReport = {
   totalPageViews: number
   totalClicks: number
   repositoryViews: number
-  projectViews: { projectId: string; title: string; count: number }[]
-  needViews: { projectId: string; needId: string; label: string; count: number }[]
-  clicks: { label: string; count: number }[]
+  projectViews: { projectId: string title: string count: number }[]
+  needViews: { projectId: string needId: string label: string count: number }[]
+  clicks: { label: string count: number }[]
   firstReceivedAt: string | null
   lastReceivedAt: string | null
   skippedLines: number
@@ -23,7 +23,9 @@ export function toStoredLine(event: AnalyticsEvent, receivedAt: Date): string {
 }
 
 /** Lee el contenido JSONL y descarta líneas corruptas o que ya no cumplen el contrato. */
-export function parseStoredEvents(content: string): {
+export function parseStoredEvents(
+  content: string,
+): {
   events: StoredAnalyticsEvent[]
   skippedLines: number
 } {
@@ -34,10 +36,9 @@ export function parseStoredEvents(content: string): {
     if (!line.trim()) continue
 
     try {
-      const { received_at: receivedAt, ...event } = JSON.parse(line) as Record<
-        string,
-        unknown
-      >
+      const { received_at: receivedAt, ...event } = JSON.parse(
+        line,
+      ) as Record<string, unknown>
 
       if (typeof receivedAt === "string" && isAnalyticsEvent(event)) {
         events.push({ ...event, received_at: receivedAt })
@@ -160,19 +161,25 @@ export function renderVisitsReportText(report: VisitsReport): string {
     "Vistas por proyecto:",
   ]
 
-  const list = (rows: { label: string; count: number }[]) => {
+  const list = (rows: { label: string count: number }[]) => {
     if (rows.length === 0) lines.push("  (ninguna)")
-    for (const row of rows) lines.push(`  ${String(row.count).padStart(5)}  ${row.label}`)
+    for (const row of rows)
+      lines.push(`  ${String(row.count).padStart(5)}  ${row.label}`)
   }
 
-  list(report.projectViews.map((row) => ({ label: row.title, count: row.count })))
+  list(
+    report.projectViews.map((row) => ({ label: row.title, count: row.count })),
+  )
   lines.push("", "Vistas por necesidad:")
   list(report.needViews)
   lines.push("", "Clics (evento / destino / proyecto):")
   list(report.clicks)
 
   if (report.skippedLines > 0) {
-    lines.push("", `Lineas descartadas por formato invalido: ${report.skippedLines}`)
+    lines.push(
+      "",
+      `Lineas descartadas por formato invalido: ${report.skippedLines}`,
+    )
   }
 
   return lines.join("\n")

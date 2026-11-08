@@ -22,9 +22,9 @@ describe("resolveEnvironment", () => {
   })
 
   it("resolves a site-relative base URL against the current site", () => {
-    expect(resolveEnvironment("api", "/", "https://madv.example.test/")).toEqual(
-      { analyticsMode: "api", apiBaseUrl: "https://madv.example.test" },
-    )
+    expect(
+      resolveEnvironment("api", "/", "https://madv.example.test/"),
+    ).toEqual({ analyticsMode: "api", apiBaseUrl: "https://madv.example.test" })
 
     expect(
       resolveEnvironment("api", "/", "https://madv.example.test/preview/"),

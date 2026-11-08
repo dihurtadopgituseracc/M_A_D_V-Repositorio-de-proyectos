@@ -1,13 +1,8 @@
-import { useEffect, useState } from "react"
+import { lazy, Suspense, useEffect, useState } from "react"
 import LandingPage from "@/pages/LandingPage"
-import GalleryPage from "@/pages/GalleryPage"
-import EventsPage from "@/pages/EventsPage"
-import FaqPage from "@/pages/FaqPage"
-import RepositoryPage from "@/pages/RepositoryPage"
-import ProjectDetailPage from "@/pages/ProjectDetailPage"
-import NeedDetailPage from "@/pages/NeedDetailPage"
 import StaggeredMenu from "@/component/StaggeredMenu"
 import AngleIcon from "@/components/common/AngleIcon"
+import PageLoading from "@/components/common/PageLoading"
 import type { Need, Project } from "@/types/project"
 import { projects } from "@/data/projects"
 import { scrollToTop } from "@/utils/scroll"
@@ -17,43 +12,73 @@ import {
   trackRepositoryView,
 } from "@/services/analytics/analytics.service"
 
+// La landing se carga de inmediato; las demás vistas se descargan bajo demanda.
+const GalleryPage = lazy(() => import("@/pages/GalleryPage"))
+const EventsPage = lazy(() => import("@/pages/EventsPage"))
+const FaqPage = lazy(() => import("@/pages/FaqPage"))
+const RepositoryPage = lazy(() => import("@/pages/RepositoryPage"))
+const ProjectDetailPage = lazy(() => import("@/pages/ProjectDetailPage"))
+const NeedDetailPage = lazy(() => import("@/pages/NeedDetailPage"))
+
 function getProjectFromUrl() {
   const projectId = new URLSearchParams(window.location.search).get("proyecto")
   return projects.find((project) => project.id === projectId) ?? null
 }
 
-function isRepositoryFromUrl() {
-  return (
-    new URLSearchParams(window.location.search).get("vista") === "repository"
-  )
+function getViewFromUrl() {
+  return new URLSearchParams(window.location.search).get("vista")
 }
 
-function isGalleryFromUrl() {
-  return new URLSearchParams(window.location.search).get("vista") === "gallery"
+// Deriva el estado de navegación desde la URL en una sola lectura.
+function readNavFromUrl() {
+  const project = getProjectFromUrl()
+  const view = project ? null : getViewFromUrl()
+  return {
+    project,
+    repositoryOpen: view === "repository",
+    galleryOpen: view === "gallery",
+    eventsOpen: view === "events",
+    faqOpen: view === "faq",
+  }
 }
 
-function isEventsFromUrl() {
-  return new URLSearchParams(window.location.search).get("vista") === "events"
-}
+// Datos estáticos del menú: definidos una sola vez fuera del componente para
+// no recrearlos en cada render.
+const MENU_ACCENT_COLORS = ["#f0cb82", "#18d66d", "#171827"]
 
-function isFaqFromUrl() {
-  return new URLSearchParams(window.location.search).get("vista") === "faq"
-}
+const MENU_ITEMS = [
+  { label: "Inicio", ariaLabel: "Ir a la página de inicio", link: "./" },
+  {
+    label: "Proyectos",
+    ariaLabel: "Ver proyectos abiertos",
+    link: "./?vista=repository",
+  },
+  {
+    label: "Sobre MADV",
+    ariaLabel: "Conocer más sobre MADV",
+    link: "./?vista=gallery",
+  },
+  { label: "Eventos", ariaLabel: "Ver eventos", link: "./?vista=events" },
+  {
+    label: "Preguntas",
+    ariaLabel: "Ver preguntas frecuentes",
+    link: "./?vista=faq",
+  },
+]
+
+const MENU_SOCIAL_ITEMS = [
+  { label: "Instagram", link: "https://www.instagram.com/gdd_col/" },
+]
 
 export default function App() {
-  const [selected, setSelected] = useState<Project | null>(getProjectFromUrl)
+  const [initialNav] = useState(readNavFromUrl)
+  const [selected, setSelected] = useState<Project | null>(initialNav.project)
   const [repositoryOpen, setRepositoryOpen] = useState(
-    () => !getProjectFromUrl() && isRepositoryFromUrl(),
+    initialNav.repositoryOpen,
   )
-  const [galleryOpen, setGalleryOpen] = useState(
-    () => !getProjectFromUrl() && isGalleryFromUrl(),
-  )
-  const [eventsOpen, setEventsOpen] = useState(
-    () => !getProjectFromUrl() && isEventsFromUrl(),
-  )
-  const [faqOpen, setFaqOpen] = useState(
-    () => !getProjectFromUrl() && isFaqFromUrl(),
-  )
+  const [galleryOpen, setGalleryOpen] = useState(initialNav.galleryOpen)
+  const [eventsOpen, setEventsOpen] = useState(initialNav.eventsOpen)
+  const [faqOpen, setFaqOpen] = useState(initialNav.faqOpen)
   const [selectedNeed, setSelectedNeed] = useState<{
     need: Need
     index: number
@@ -61,12 +86,12 @@ export default function App() {
 
   useEffect(() => {
     const syncFromUrl = () => {
-      const project = getProjectFromUrl()
-      setSelected(project)
-      setRepositoryOpen(!project && isRepositoryFromUrl())
-      setGalleryOpen(!project && isGalleryFromUrl())
-      setEventsOpen(!project && isEventsFromUrl())
-      setFaqOpen(!project && isFaqFromUrl())
+      const nav = readNavFromUrl()
+      setSelected(nav.project)
+      setRepositoryOpen(nav.repositoryOpen)
+      setGalleryOpen(nav.galleryOpen)
+      setEventsOpen(nav.eventsOpen)
+      setFaqOpen(nav.faqOpen)
       setSelectedNeed(null)
       trackCurrentPageView()
     }
@@ -75,81 +100,53 @@ export default function App() {
     return () => window.removeEventListener("popstate", syncFromUrl)
   }, [])
 
-  const openRepository = () => {
+  // Empuja una nueva URL aplicando un mutador sobre los parámetros actuales.
+  const pushUrl = (mutate: (params: URLSearchParams) => void) => {
     const url = new URL(window.location.href)
-    url.searchParams.delete("proyecto")
-    url.searchParams.set("vista", "repository")
+    mutate(url.searchParams)
     window.history.pushState({}, "", `${url.pathname}${url.search}`)
-    trackRepositoryView()
+  }
+
+  // Marca una única vista como abierta (o ninguna cuando es null).
+  const setOpenView = (
+    view: "repository" | "gallery" | "events" | "faq" | null,
+  ) => {
+    setRepositoryOpen(view === "repository")
+    setGalleryOpen(view === "gallery")
+    setEventsOpen(view === "events")
+    setFaqOpen(view === "faq")
+  }
+
+  // Abre una vista secundaria: actualiza la URL, limpia selección y hace scroll.
+  const openView = (
+    view: "repository" | "gallery" | "events" | "faq",
+    track?: () => void,
+  ) => {
+    pushUrl((params) => {
+      params.delete("proyecto")
+      params.set("vista", view)
+    })
+    track?.()
     setSelected(null)
     setSelectedNeed(null)
-    setRepositoryOpen(true)
-    setGalleryOpen(false)
-    setEventsOpen(false)
-    setFaqOpen(false)
+    setOpenView(view)
     scrollToTop()
   }
 
-  const openGallery = () => {
-    const url = new URL(window.location.href)
-    url.searchParams.delete("proyecto")
-    url.searchParams.set("vista", "gallery")
-    window.history.pushState({}, "", `${url.pathname}${url.search}`)
-    setSelected(null)
-    setSelectedNeed(null)
-    setRepositoryOpen(false)
-    setGalleryOpen(true)
-    setEventsOpen(false)
-    setFaqOpen(false)
+  // Cierra la vista actual y vuelve a la landing eliminando `vista` de la URL.
+  const closeView = () => {
+    pushUrl((params) => params.delete("vista"))
+    setOpenView(null)
     scrollToTop()
   }
 
-  const openEvents = () => {
-    const url = new URL(window.location.href)
-    url.searchParams.delete("proyecto")
-    url.searchParams.set("vista", "events")
-    window.history.pushState({}, "", `${url.pathname}${url.search}`)
-    setSelected(null)
-    setSelectedNeed(null)
-    setRepositoryOpen(false)
-    setGalleryOpen(false)
-    setEventsOpen(true)
-    setFaqOpen(false)
-    scrollToTop()
-  }
-
-  const closeEvents = () => {
-    const url = new URL(window.location.href)
-    url.searchParams.delete("vista")
-    window.history.pushState({}, "", `${url.pathname}${url.search}`)
-    setEventsOpen(false)
-    setFaqOpen(false)
-    scrollToTop()
-  }
-
-  const closeFaq = () => {
-    const url = new URL(window.location.href)
-    url.searchParams.delete("vista")
-    window.history.pushState({}, "", `${url.pathname}${url.search}`)
-    setFaqOpen(false)
-    scrollToTop()
-  }
-
-  const closeGallery = () => {
-    const url = new URL(window.location.href)
-    url.searchParams.delete("vista")
-    window.history.pushState({}, "", `${url.pathname}${url.search}`)
-    setGalleryOpen(false)
-    scrollToTop()
-  }
-
-  const closeRepository = () => {
-    const url = new URL(window.location.href)
-    url.searchParams.delete("vista")
-    window.history.pushState({}, "", `${url.pathname}${url.search}`)
-    setRepositoryOpen(false)
-    scrollToTop()
-  }
+  const openRepository = () => openView("repository", trackRepositoryView)
+  const openGallery = () => openView("gallery")
+  const openEvents = () => openView("events")
+  const closeEvents = closeView
+  const closeFaq = closeView
+  const closeGallery = closeView
+  const closeRepository = closeView
 
   const navigate = (project: Project | null) => {
     if (!project) {
@@ -157,16 +154,13 @@ export default function App() {
       return
     }
 
-    const url = new URL(window.location.href)
-    url.searchParams.delete("vista")
-    url.searchParams.set("proyecto", project.id)
-    window.history.pushState({}, "", `${url.pathname}${url.search}`)
+    pushUrl((params) => {
+      params.delete("vista")
+      params.set("proyecto", project.id)
+    })
     trackProjectView(project.id)
     setSelected(project)
-    setRepositoryOpen(false)
-    setGalleryOpen(false)
-    setEventsOpen(false)
-    setFaqOpen(false)
+    setOpenView(null)
     setSelectedNeed(null)
     scrollToTop()
   }
@@ -253,7 +247,7 @@ export default function App() {
         headerColor={navBackgroundColor}
         backButtonColor={navTextColor}
         accentColor="#38c528"
-        colors={["#f0cb82", "#18d66d", "#171827"]}
+        colors={MENU_ACCENT_COLORS}
         leadingContent={
           backAction ? (
             <button
@@ -269,41 +263,10 @@ export default function App() {
             <span aria-hidden="true" />
           )
         }
-        items={[
-          {
-            label: "Inicio",
-            ariaLabel: "Ir a la página de inicio",
-            link: "./",
-          },
-          {
-            label: "Proyectos",
-            ariaLabel: "Ver proyectos abiertos",
-            link: "./?vista=repository",
-          },
-          {
-            label: "Sobre MADV",
-            ariaLabel: "Conocer más sobre MADV",
-            link: "./?vista=gallery",
-          },
-          {
-            label: "Eventos",
-            ariaLabel: "Ver eventos",
-            link: "./?vista=events",
-          },
-          {
-            label: "Preguntas",
-            ariaLabel: "Ver preguntas frecuentes",
-            link: "./?vista=faq",
-          },
-        ]}
-        socialItems={[
-          {
-            label: "Instagram",
-            link: "https://www.instagram.com/gdd_col/",
-          },
-        ]}
+        items={MENU_ITEMS}
+        socialItems={MENU_SOCIAL_ITEMS}
       />
-      {page}
+      <Suspense fallback={<PageLoading />}>{page}</Suspense>
     </>
   )
 }

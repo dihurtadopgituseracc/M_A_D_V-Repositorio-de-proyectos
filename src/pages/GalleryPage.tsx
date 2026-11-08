@@ -115,7 +115,7 @@ function GalleryImage({
 }) {
   return (
     <div
-      className={`relative flex h-full w-full items-center justify-center overflow-hidden bg-[#171827] ${
+      className={`relative flex h-full w-full items-center justify-center overflow-hidden bg-tinta ${
         expanded ? "aspect-video" : "aspect-[16/10]"
       }`}
     >
@@ -123,9 +123,7 @@ function GalleryImage({
         aria-hidden="true"
         className="absolute inset-0 flex flex-col items-center justify-center gap-2 text-center text-white/70"
       >
-        <span className={`${semi} text-[28px] text-[#f0cb82]`}>
-          {item.number}
-        </span>
+        <span className={`${semi} text-[28px] text-oro`}>{item.number}</span>
         <span className={`${reg} text-[11px]`}>
           No se pudo cargar {item.src.split("/").at(-1)}
         </span>
@@ -187,7 +185,7 @@ export default function GalleryPage({ onBack }: { onBack: () => void }) {
   }, [activeIndex])
 
   return (
-    <main className="min-h-[100dvh] bg-[#171827] px-5 pb-16 pt-5 text-white sm:px-8 sm:pt-8 lg:px-10">
+    <main className="min-h-[100dvh] bg-tinta px-5 pb-16 pt-5 text-white sm:px-8 sm:pt-8 lg:px-10">
       <div className="mx-auto max-w-[1120px]">
         <section className="pt-10 sm:pt-14">
           <p className={`${semi} text-[22px] uppercase text-white/65`}>
@@ -218,7 +216,7 @@ export default function GalleryPage({ onBack }: { onBack: () => void }) {
             propuesta.
           </p>
 
-          <div className="mt-8 overflow-hidden rounded-[10px] bg-[#171827] px-2 py-4 sm:px-6 sm:py-6">
+          <div className="mt-8 overflow-hidden rounded-[10px] bg-tinta px-2 py-4 sm:px-6 sm:py-6">
             <DepthCarousel
               items={galleryItems.map((item) => ({
                 image: item.src,
@@ -251,7 +249,7 @@ export default function GalleryPage({ onBack }: { onBack: () => void }) {
 
       {activeItem && (
         <div
-          className="fixed inset-0 z-50 flex flex-col bg-[#101116]/[0.97] p-4 text-white sm:p-6"
+          className="fixed inset-0 z-50 flex flex-col bg-noche/[0.97] p-4 text-white sm:p-6"
           role="dialog"
           aria-modal="true"
           aria-label={`Visor de imagen ${activeItem.number}`}

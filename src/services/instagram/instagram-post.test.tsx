@@ -54,7 +54,9 @@ describe("parseInstagramPostUrl", () => {
 })
 
 describe("parseInstagramPostHtml", () => {
-  const parsedUrl = parseInstagramPostUrl("https://www.instagram.com/p/BsOGulcndj-/")!
+  const parsedUrl = parseInstagramPostUrl(
+    "https://www.instagram.com/p/BsOGulcndj-/",
+  )!
 
   it("reads author, date, caption and image from the public preview tags", () => {
     expect(parseInstagramPostHtml(realPreviewHtml, parsedUrl)).toEqual({
@@ -72,17 +74,28 @@ describe("parseInstagramPostHtml", () => {
 
   it("returns null for a login or error page without post tags", () => {
     expect(
-      parseInstagramPostHtml('<meta property="og:title" content="Instagram" />', parsedUrl),
+      parseInstagramPostHtml(
+        '<meta property="og:title" content="Instagram" />',
+        parsedUrl,
+      ),
     ).toBeNull()
   })
 })
 
 describe("helpers", () => {
   it("only allows Instagram/Meta CDN images over HTTPS", () => {
-    expect(isAllowedInstagramImageUrl("https://scontent.cdninstagram.com/v/a.jpg")).toBe(true)
-    expect(isAllowedInstagramImageUrl("https://scontent-bog1-1.xx.fbcdn.net/a.jpg")).toBe(true)
-    expect(isAllowedInstagramImageUrl("http://scontent.cdninstagram.com/a.jpg")).toBe(false)
-    expect(isAllowedInstagramImageUrl("https://cdninstagram.com.evil.example/a.jpg")).toBe(false)
+    expect(
+      isAllowedInstagramImageUrl("https://scontent.cdninstagram.com/v/a.jpg"),
+    ).toBe(true)
+    expect(
+      isAllowedInstagramImageUrl("https://scontent-bog1-1.xx.fbcdn.net/a.jpg"),
+    ).toBe(true)
+    expect(
+      isAllowedInstagramImageUrl("http://scontent.cdninstagram.com/a.jpg"),
+    ).toBe(false)
+    expect(
+      isAllowedInstagramImageUrl("https://cdninstagram.com.evil.example/a.jpg"),
+    ).toBe(false)
   })
 
   it("formats the publication date in Spanish", () => {
@@ -96,7 +109,10 @@ describe("InstagramPostCard", () => {
   let root: Root
 
   beforeEach(() => {
-    Object.defineProperty(globalThis, "IS_REACT_ACT_ENVIRONMENT", { configurable: true, value: true })
+    Object.defineProperty(globalThis, "IS_REACT_ACT_ENVIRONMENT", {
+      configurable: true,
+      value: true,
+    })
     vi.stubGlobal(
       "matchMedia",
       vi.fn((query: string) => ({
@@ -120,7 +136,9 @@ describe("InstagramPostCard", () => {
   })
 
   it("renders nothing when no post URL is configured", async () => {
-    await act(async () => root.render(<InstagramPostCard result={{ status: "empty" }} />))
+    await act(async () =>
+      root.render(<InstagramPostCard result={{ status: "empty" }} />),
+    )
     expect(container.innerHTML).toBe("")
   })
 
@@ -134,7 +152,10 @@ describe("InstagramPostCard", () => {
     await act(async () =>
       root.render(
         <InstagramPostCard
-          result={{ status: "ok", post: { ...post, image: "data:image/jpeg;base64,AAAA" } }}
+          result={{
+            status: "ok",
+            post: { ...post, image: "data:image/jpeg;base64,AAAA" },
+          }}
         />,
       ),
     )
@@ -147,7 +168,9 @@ describe("InstagramPostCard", () => {
     expect(card?.querySelector("img[src^='data:image/jpeg']")).not.toBeNull()
 
     const link = container.querySelector("a")
-    expect(link?.getAttribute("href")).toBe("https://www.instagram.com/p/BsOGulcndj-/")
+    expect(link?.getAttribute("href")).toBe(
+      "https://www.instagram.com/p/BsOGulcndj-/",
+    )
     expect(link?.getAttribute("rel")).toBe("noopener noreferrer")
   })
 
@@ -155,7 +178,11 @@ describe("InstagramPostCard", () => {
     await act(async () =>
       root.render(
         <InstagramPostCard
-          result={{ status: "error", url: "https://www.instagram.com/p/BsOGulcndj-/", message: "HTTP 429" }}
+          result={{
+            status: "error",
+            url: "https://www.instagram.com/p/BsOGulcndj-/",
+            message: "HTTP 429",
+          }}
         />,
       ),
     )

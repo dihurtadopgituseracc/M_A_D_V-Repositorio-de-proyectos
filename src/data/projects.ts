@@ -355,7 +355,7 @@ export const projects: Project[] = [
       "PC",
     ],
     needs: [],
-    contacts: [ ],
+    contacts: [],
     accent: "#6f557d",
     artLabel: "LUCHADOR CONTRA LO OCULTO · CONCEPTO PARANORMAL",
     artImage: `${import.meta.env.BASE_URL}assets/projects/LCLO.svg`,
