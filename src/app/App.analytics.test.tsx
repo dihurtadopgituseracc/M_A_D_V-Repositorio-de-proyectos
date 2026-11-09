@@ -14,21 +14,9 @@ import { localAnalyticsAdapter } from "@/services/analytics/local.adapter"
 
 import { trackCurrentPageView } from "@/services/analytics/analytics.service"
 
-// La página de Eventos muestra el post configurado; aquí se usa uno de ejemplo
-// en lugar del sustituto vacío.
-vi.mock("virtual:instagram-post", () => ({
-  default: {
-    status: "ok",
-    post: {
-      permalink: "https://www.instagram.com/p/TEST12345/",
-      shortcode: "TEST12345",
-      username: "gdd_col",
-      displayName: "Gamers, Developers & Designers",
-      caption: "Taller de prueba en CYT 304",
-      publishedOn: "2026-10-22",
-      image: null,
-    },
-  },
+// La página de Eventos incrusta el post configurado; aquí se usa un enlace de ejemplo.
+vi.mock("@/data/instagram-post", () => ({
+  instagramPostUrl: "https://www.instagram.com/p/TEST12345/",
 }))
 
 Object.defineProperty(globalThis, "IS_REACT_ACT_ENVIRONMENT", {
@@ -234,13 +222,11 @@ describe("analytics interface instrumentation", () => {
     )
     expect(new Set(ids).size).toBe(ids.length)
 
-    const card = container.querySelector('article[data-variant="instagram"]')
-    expect(card?.textContent).toContain("gdd_col")
-    expect(card?.textContent).toContain("Taller de prueba")
-    expect(card?.textContent).not.toMatch(/\blikes\b/)
-    expect(
-      container.querySelectorAll('article[data-variant="instagram"]'),
-    ).toHaveLength(1)
+    const embeds = container.querySelectorAll("main iframe")
+    expect(embeds).toHaveLength(1)
+    expect(embeds[0]?.getAttribute("src")).toBe(
+      "https://www.instagram.com/p/TEST12345/embed/captioned/",
+    )
     expect(
       container.querySelector(
         'a[href="https://www.instagram.com/p/TEST12345/"]',

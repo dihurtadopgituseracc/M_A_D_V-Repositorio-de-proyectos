@@ -1,4 +1,4 @@
-// Publicación de Instagram que se muestra en la página de Eventos.
+// Publicación de Instagram que se incrusta (embed oficial) en la página de Eventos.
 //
 // Pega aquí el enlace público del post (el que da "Copiar enlace" en Instagram), por ejemplo:
 //   https://www.instagram.com/p/XXXXXXXXXXX/

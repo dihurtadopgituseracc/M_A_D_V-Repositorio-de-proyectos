@@ -1,12 +1,18 @@
-import instagramPost from "virtual:instagram-post"
+import { useEffect, useRef, useState } from "react"
 import { FaInstagram } from "react-icons/fa6"
 
-import { SocialCard } from "@/components/dimaac/social-card"
 import { reg, semi } from "@/constants/styles"
+import { instagramPostUrl } from "@/data/instagram-post"
 import {
-  formatPostDate,
-  type InstagramPostResult,
+  INSTAGRAM_ORIGIN,
+  instagramEmbedUrl,
+  parseInstagramPostUrl,
+  readEmbedHeight,
 } from "@/services/instagram/instagram-post"
+
+/** Altura inicial del iframe hasta que Instagram anuncia la real (post vertical con descripción). */
+const DEFAULT_EMBED_HEIGHT = 720
+const MAX_EMBED_HEIGHT = 2000
 
 function InstagramPostLink({ href }: { href: string }) {
   return (
@@ -30,48 +36,56 @@ function InstagramPostLink({ href }: { href: string }) {
 }
 
 /**
- * Publicación real de Instagram en formato SocialCard. El enlace se configura en
- * `src/data/instagram-post.ts`; los datos llegan ya descargados por el plugin de Vite.
+ * Embed oficial de Instagram del post configurado en `src/data/instagram-post.ts`.
+ * El navegador lo carga directamente desde Instagram; el proyecto no descarga ni guarda
+ * la imagen ni el texto. Instagram dibuja la imagen en su proporción real y la descripción.
  */
 export default function InstagramPostCard({
-  result = instagramPost,
+  url = instagramPostUrl,
 }: {
-  result?: InstagramPostResult
+  url?: string
 }) {
-  if (result.status === "empty") return null
+  const iframeRef = useRef<HTMLIFrameElement>(null)
+  const [height, setHeight] = useState(DEFAULT_EMBED_HEIGHT)
+  const parsed = parseInstagramPostUrl(url)
 
-  if (result.status === "error") {
-    return (
-      <div className="flex w-full max-w-[380px] flex-col items-center gap-2 text-center">
-        {import.meta.env.DEV && (
-          <p className={`${reg} text-[13px] text-coral`} role="status">
-            No se pudo cargar el post de Instagram: {result.message}
-          </p>
-        )}
-        {result.url && <InstagramPostLink href={result.url} />}
-      </div>
-    )
+  // El embed anuncia su altura con postMessage; solo se aceptan mensajes de este iframe.
+  useEffect(() => {
+    function onMessage(event: MessageEvent) {
+      if (event.origin !== INSTAGRAM_ORIGIN) return
+      if (event.source !== iframeRef.current?.contentWindow) return
+      const next = readEmbedHeight(event.data)
+      if (next) setHeight(Math.min(next, MAX_EMBED_HEIGHT))
+    }
+    window.addEventListener("message", onMessage)
+    return () => window.removeEventListener("message", onMessage)
+  }, [])
+
+  if (!url.trim()) return null
+
+  if (!parsed) {
+    return import.meta.env.DEV ? (
+      <p className={`${reg} text-center text-[13px] text-coral`} role="status">
+        El enlace de src/data/instagram-post.ts no es un post público de
+        Instagram (se espera https://www.instagram.com/p/&lt;código&gt;/).
+      </p>
+    ) : null
   }
 
-  const { post } = result
-
   return (
-    <div className="flex w-full max-w-[380px] flex-col items-center gap-4">
-      <SocialCard
-        variant="instagram"
-        author={{
-          name: post.displayName,
-          handle: post.username,
-          avatar: post.avatar,
-        }}
-        content={post.caption}
-        image={post.image ?? undefined}
-        imageAlt={`Publicación de @${post.username} en Instagram`}
-        imageRatio={1}
-        showLikes={false}
-        timestamp={formatPostDate(post.publishedOn)}
+    <div className="flex w-full max-w-[400px] flex-col items-center gap-4">
+      <iframe
+        ref={iframeRef}
+        src={instagramEmbedUrl(parsed)}
+        title="Publicación de Instagram del siguiente evento"
+        loading="lazy"
+        referrerPolicy="strict-origin-when-cross-origin"
+        sandbox="allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox"
+        scrolling="no"
+        style={{ height }}
+        className="block w-full overflow-hidden rounded-[12px] border border-tinta/15 bg-white"
       />
-      <InstagramPostLink href={post.permalink} />
+      <InstagramPostLink href={parsed.canonicalUrl} />
     </div>
   )
 }

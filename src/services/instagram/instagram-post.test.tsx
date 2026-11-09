@@ -2,27 +2,15 @@
 
 import { act } from "react"
 import { createRoot, type Root } from "react-dom/client"
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
+import { afterEach, beforeEach, describe, expect, it } from "vitest"
 
 import InstagramPostCard from "@/components/instagram/InstagramPostCard"
 
 import {
-  formatPostDate,
-  isAllowedInstagramImageUrl,
-  parseInstagramPostHtml,
+  instagramEmbedUrl,
   parseInstagramPostUrl,
+  readEmbedHeight,
 } from "./instagram-post"
-
-// Etiquetas reales que Instagram devolvió para https://www.instagram.com/p/BsOGulcndj-/
-// al user-agent de vista previa de enlaces (recortadas a lo que usa el parser).
-const realPreviewHtml = `<!DOCTYPE html><html><head>
-<meta property="og:type" content="article" />
-<meta name="description" content="60M likes, 4M comments - world_record_egg on January 4, 2019: &quot;Let&#x2019;s set a world record together and get the most liked post on Instagram. Beating the current world record held by Kylie Jenner (18 million)! We got this &#x1f64c;\n\n#LikeTheEgg #EggSoldiers #EggGang&quot;. " />
-<meta property="og:title" content="Just An Egg &#x1f95a; on Instagram: &quot;Let&#x2019;s set a world record together and get the most liked post on Instagram. Beating the current world record held by Kylie Jenner (18 million)! We got this &#x1f64c;\n\n#LikeTheEgg #EggSoldiers #EggGang&quot;" />
-<meta property="og:image" content="https://scontent.cdninstagram.com/v/t51.82787-15/625727639_n.jpg?stp=dst-jpg_e35_s640x640_tt6&amp;_nc_cat=104" />
-<meta property="og:url" content="https://www.instagram.com/world_record_egg/p/BsOGulcndj-/" />
-<meta property="og:description" content="60M likes, 4M comments - world_record_egg on January 4, 2019: &quot;Let&#x2019;s set a world record together and get the most liked post on Instagram. Beating the current world record held by Kylie Jenner (18 million)! We got this &#x1f64c;\n\n#LikeTheEgg #EggSoldiers #EggGang&quot;. " />
-</head><body></body></html>`
 
 describe("parseInstagramPostUrl", () => {
   it.each([
@@ -53,54 +41,29 @@ describe("parseInstagramPostUrl", () => {
   })
 })
 
-describe("parseInstagramPostHtml", () => {
-  const parsedUrl = parseInstagramPostUrl(
-    "https://www.instagram.com/p/BsOGulcndj-/",
-  )!
-
-  it("reads author, date, caption and image from the public preview tags", () => {
-    expect(parseInstagramPostHtml(realPreviewHtml, parsedUrl)).toEqual({
-      permalink: "https://www.instagram.com/p/BsOGulcndj-/",
-      shortcode: "BsOGulcndj-",
-      username: "world_record_egg",
-      displayName: "Just An Egg 🥚",
-      caption:
-        "Let’s set a world record together and get the most liked post on Instagram. Beating the current world record held by Kylie Jenner (18 million)! We got this 🙌\n\n#LikeTheEgg #EggSoldiers #EggGang",
-      publishedOn: "2019-01-04",
-      imageUrl:
-        "https://scontent.cdninstagram.com/v/t51.82787-15/625727639_n.jpg?stp=dst-jpg_e35_s640x640_tt6&_nc_cat=104",
-    })
-  })
-
-  it("returns null for a login or error page without post tags", () => {
+describe("embed helpers", () => {
+  it("builds the official captioned embed URL", () => {
     expect(
-      parseInstagramPostHtml(
-        '<meta property="og:title" content="Instagram" />',
-        parsedUrl,
+      instagramEmbedUrl(
+        parseInstagramPostUrl("https://www.instagram.com/p/BsOGulcndj-/?x=1")!,
       ),
-    ).toBeNull()
-  })
-})
-
-describe("helpers", () => {
-  it("only allows Instagram/Meta CDN images over HTTPS", () => {
-    expect(
-      isAllowedInstagramImageUrl("https://scontent.cdninstagram.com/v/a.jpg"),
-    ).toBe(true)
-    expect(
-      isAllowedInstagramImageUrl("https://scontent-bog1-1.xx.fbcdn.net/a.jpg"),
-    ).toBe(true)
-    expect(
-      isAllowedInstagramImageUrl("http://scontent.cdninstagram.com/a.jpg"),
-    ).toBe(false)
-    expect(
-      isAllowedInstagramImageUrl("https://cdninstagram.com.evil.example/a.jpg"),
-    ).toBe(false)
+    ).toBe("https://www.instagram.com/p/BsOGulcndj-/embed/captioned/")
   })
 
-  it("formats the publication date in Spanish", () => {
-    expect(formatPostDate("2019-01-04")).toBe("4 de enero de 2019")
-    expect(formatPostDate(null)).toBe("Instagram")
+  it("reads the height announced by the embed", () => {
+    expect(
+      readEmbedHeight('{"type":"MEASURE","details":{"height":812.4}}'),
+    ).toBe(813)
+    expect(readEmbedHeight({ type: "MEASURE", details: { height: 640 } })).toBe(
+      640,
+    )
+    expect(readEmbedHeight('{"type":"OTHER","details":{"height":10}}')).toBe(
+      null,
+    )
+    expect(readEmbedHeight("not json")).toBeNull()
+    expect(readEmbedHeight({ type: "MEASURE", details: { height: -5 } })).toBe(
+      null,
+    )
   })
 })
 
@@ -113,17 +76,6 @@ describe("InstagramPostCard", () => {
       configurable: true,
       value: true,
     })
-    vi.stubGlobal(
-      "matchMedia",
-      vi.fn((query: string) => ({
-        matches: query.includes("reduce"),
-        media: query,
-        addEventListener: vi.fn(),
-        removeEventListener: vi.fn(),
-        addListener: vi.fn(),
-        removeListener: vi.fn(),
-      })),
-    )
     container = document.createElement("div")
     document.body.append(container)
     root = createRoot(container)
@@ -132,40 +84,26 @@ describe("InstagramPostCard", () => {
   afterEach(async () => {
     await act(async () => root.unmount())
     container.remove()
-    vi.unstubAllGlobals()
   })
 
   it("renders nothing when no post URL is configured", async () => {
-    await act(async () =>
-      root.render(<InstagramPostCard result={{ status: "empty" }} />),
-    )
+    await act(async () => root.render(<InstagramPostCard url="" />))
     expect(container.innerHTML).toBe("")
   })
 
-  it("renders the real post without a like counter and links to it", async () => {
-    const metadata = parseInstagramPostHtml(
-      realPreviewHtml,
-      parseInstagramPostUrl("https://www.instagram.com/p/BsOGulcndj-/")!,
-    )!
-    const { imageUrl: _imageUrl, ...post } = metadata
-
+  it("embeds the post from Instagram and links to it", async () => {
     await act(async () =>
       root.render(
-        <InstagramPostCard
-          result={{
-            status: "ok",
-            post: { ...post, image: "data:image/jpeg;base64,AAAA" },
-          }}
-        />,
+        <InstagramPostCard url="https://www.instagram.com/p/BsOGulcndj-/?igsh=abc" />,
       ),
     )
 
-    const card = container.querySelector('article[data-variant="instagram"]')
-    expect(card?.textContent).toContain("world_record_egg")
-    expect(card?.textContent).toContain("#LikeTheEgg")
-    expect(card?.textContent).toContain("4 de enero de 2019")
-    expect(card?.textContent).not.toMatch(/\blikes\b/)
-    expect(card?.querySelector("img[src^='data:image/jpeg']")).not.toBeNull()
+    const iframe = container.querySelector("iframe")
+    expect(iframe?.getAttribute("src")).toBe(
+      "https://www.instagram.com/p/BsOGulcndj-/embed/captioned/",
+    )
+    expect(iframe?.getAttribute("title")).toBeTruthy()
+    expect(container.querySelector("img")).toBeNull()
 
     const link = container.querySelector("a")
     expect(link?.getAttribute("href")).toBe(
@@ -174,22 +112,36 @@ describe("InstagramPostCard", () => {
     expect(link?.getAttribute("rel")).toBe("noopener noreferrer")
   })
 
-  it("falls back to a plain link when the post could not be loaded", async () => {
+  it("only resizes for height messages from its own Instagram iframe", async () => {
     await act(async () =>
       root.render(
-        <InstagramPostCard
-          result={{
-            status: "error",
-            url: "https://www.instagram.com/p/BsOGulcndj-/",
-            message: "HTTP 429",
-          }}
-        />,
+        <InstagramPostCard url="https://www.instagram.com/p/BsOGulcndj-/" />,
       ),
     )
+    const iframe = container.querySelector("iframe")!
+    const initial = iframe.style.height
+    const measure = '{"type":"MEASURE","details":{"height":900}}'
 
-    expect(container.querySelector("article")).toBeNull()
-    expect(container.querySelector("a")?.getAttribute("href")).toBe(
-      "https://www.instagram.com/p/BsOGulcndj-/",
+    await act(async () =>
+      window.dispatchEvent(
+        new MessageEvent("message", {
+          data: measure,
+          origin: "https://evil.example",
+          source: iframe.contentWindow,
+        }),
+      ),
     )
+    expect(iframe.style.height).toBe(initial)
+
+    await act(async () =>
+      window.dispatchEvent(
+        new MessageEvent("message", {
+          data: measure,
+          origin: "https://www.instagram.com",
+          source: iframe.contentWindow,
+        }),
+      ),
+    )
+    expect(iframe.style.height).toBe("900px")
   })
 })

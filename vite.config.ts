@@ -16,16 +16,6 @@ import type * as AnalyticsTypesModule from "./src/services/analytics/analytics.t
 
 import type * as ProjectsModule from "./src/data/projects"
 
-import { instagramPostUrl } from "./src/data/instagram-post"
-
-import {
-  isAllowedInstagramImageUrl,
-  parseInstagramPostHtml,
-  parseInstagramPostUrl,
-  readMetaTags,
-  type InstagramPostResult,
-} from "./src/services/instagram/instagram-post"
-
 import siteConfiguration from "./.figma/make/site.json"
 
 // Vite config — https://vitejs.dev/config/
@@ -76,8 +66,6 @@ export default defineConfig(({ mode }) => {
       figmaMakeKitPlugin({ storiesGlob: "/src/**/*.stories.{ts,tsx,js,jsx}" }),
 
       visitsDashboardPlugin(),
-
-      instagramPostPlugin(instagramPostUrl),
     ],
 
     resolve: {
@@ -752,160 +740,6 @@ function visitsDashboardPlugin(): Plugin {
           return send(res, 500, "Internal Server Error")
         }
       })
-    },
-  }
-}
-
-/**
- * Publicación real de Instagram para la página de Eventos.
- *
- * Expone `virtual:instagram-post` con los datos del post de `src/data/instagram-post.ts`.
- * Al arrancar `vite` o al ejecutar `vite build`, pide el enlace público con el user-agent de
- * vista previa de enlaces (el mismo mecanismo que usan WhatsApp o Facebook para mostrar la
- * tarjeta), lee las etiquetas og: y descarga la imagen y la foto de perfil como data URL.
- * Así el navegador no hace peticiones a Instagram y el build estático funciona sin servidor.
- * Si algo falla, el módulo exporta `status: "error"` y la compilación continúa.
- */
-
-function instagramPostPlugin(rawUrl: string): Plugin {
-  const VIRTUAL_ID = "virtual:instagram-post"
-
-  const RESOLVED_ID = "\0" + VIRTUAL_ID
-
-  const PREVIEW_USER_AGENT =
-    "facebookexternalhit/1.1 (+http://www.facebook.com/externalhit_uatext.php)"
-
-  const TIMEOUT_MS = 10_000
-
-  const MAX_IMAGE_BYTES = 5 * 1024 * 1024
-
-  let cached: Promise<InstagramPostResult> | null = null
-
-  async function fetchText(url: string): Promise<string> {
-    const response = await fetch(url, {
-      headers: {
-        "User-Agent": PREVIEW_USER_AGENT,
-        "Accept-Language": "en-US,en;q=0.8",
-      },
-
-      redirect: "follow",
-
-      signal: AbortSignal.timeout(TIMEOUT_MS),
-    })
-
-    if (!response.ok)
-      throw new Error(`Instagram respondió HTTP ${response.status}`)
-
-    const finalHost = new URL(response.url).hostname
-
-    if (!finalHost.endsWith("instagram.com")) {
-      throw new Error(`Instagram redirigió a ${finalHost}`)
-    }
-
-    return response.text()
-  }
-
-  async function fetchImageAsDataUrl(
-    url: string | null | undefined,
-  ): Promise<string | null> {
-    if (!url || !isAllowedInstagramImageUrl(url)) return null
-
-    const response = await fetch(url, {
-      signal: AbortSignal.timeout(TIMEOUT_MS),
-    })
-
-    const type = response.headers.get("content-type") ?? ""
-
-    if (
-      !response.ok ||
-      !/^image\/(jpeg|png|webp|gif)$/.test(type.split(";")[0]!.trim())
-    ) {
-      return null
-    }
-
-    const bytes = Buffer.from(await response.arrayBuffer())
-
-    if (bytes.length === 0 || bytes.length > MAX_IMAGE_BYTES) return null
-
-    return `data:${type.split(";")[0]!.trim()};base64,${bytes.toString("base64")}`
-  }
-
-  async function load(): Promise<InstagramPostResult> {
-    const url = rawUrl.trim()
-
-    if (!url) return { status: "empty" }
-
-    const parsedUrl = parseInstagramPostUrl(url)
-
-    if (!parsedUrl) {
-      return {
-        status: "error",
-
-        url: null,
-
-        message:
-          "El enlace no es un post público de Instagram (se espera https://www.instagram.com/p/<código>/).",
-      }
-    }
-
-    try {
-      const metadata = parseInstagramPostHtml(
-        await fetchText(parsedUrl.canonicalUrl),
-        parsedUrl,
-      )
-
-      if (!metadata) {
-        throw new Error(
-          "Instagram no devolvió los datos del post (¿es privado o fue borrado?)",
-        )
-      }
-
-      const image = await fetchImageAsDataUrl(metadata.imageUrl).catch(
-        () => null,
-      )
-
-      const avatar = await fetchText(
-        `https://www.instagram.com/${metadata.username}/`,
-      )
-
-        .then((html) => fetchImageAsDataUrl(readMetaTags(html).get("og:image")))
-
-        .catch(() => null)
-
-      const { imageUrl: _imageUrl, ...post } = metadata
-
-      return {
-        status: "ok",
-        post: { ...post, image, avatar: avatar ?? undefined },
-      }
-    } catch (error) {
-      return {
-        status: "error",
-        url: parsedUrl.canonicalUrl,
-        message: (error as Error).message,
-      }
-    }
-  }
-
-  return {
-    name: "madv-instagram-post",
-
-    resolveId(id) {
-      return id === VIRTUAL_ID ? RESOLVED_ID : null
-    },
-
-    async load(id) {
-      if (id !== RESOLVED_ID) return null
-
-      cached ??= load()
-
-      const result = await cached
-
-      if (result.status === "error") {
-        this.warn(`[instagram] ${result.message}`)
-      }
-
-      return `export default ${JSON.stringify(result)}`
     },
   }
 }

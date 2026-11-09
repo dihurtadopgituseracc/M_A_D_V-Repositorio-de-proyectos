@@ -27,13 +27,14 @@ export default function EventsPage() {
           >
             <span className={semi}>Lugar:</span> El salón nº 304 - CYT
           </p>
-          <h2
+          
+        </section>
+        <h2
             id="siguiente-evento"
             className={`${semi} mt-4 text-[20px] leading-[1.25] text-tinta sm:text-[28px]`}
           >
             El siguiente evento es:
           </h2>
-        </section>
 
         <div className="mt-10 flex w-full justify-center sm:mt-12">
           <InstagramPostCard />

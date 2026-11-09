@@ -269,6 +269,20 @@
     opacity 0.3s ease;
 }
 
+.sm-socials-link::after {
+  content: "◥";
+  display: inline-block;
+  margin-left: 0.5rem;
+  font-size: 0.55em;
+  letter-spacing: 0;
+  vertical-align: 0.2em;
+  transition: transform 0.25s ease;
+}
+
+.sm-socials-link:hover::after {
+  transform: translate(2px, -2px);
+}
+
 .sm-socials-link:hover {
   color: var(--sm-accent, #ff0000);
 }
@@ -339,7 +353,7 @@
   counter-reset: smItem;
 }
 
-.sm-panel-list[data-numbering] .sm-panel-item::after {
+.sm-panel-list[data-numbering] .sm-panel-item::before {
   counter-increment: smItem;
   content: counter(smItem, decimal-leading-zero);
   position: absolute;

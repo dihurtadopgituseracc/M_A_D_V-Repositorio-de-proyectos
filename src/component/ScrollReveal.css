@@ -1,0 +1,9 @@
+.scroll-reveal-text {
+  display: block;
+}
+
+/* Cada palabra y cada pieza (palabra o letra) se animan por separado con transform. */
+.scroll-reveal-word,
+.scroll-reveal-piece {
+  display: inline-block;
+}

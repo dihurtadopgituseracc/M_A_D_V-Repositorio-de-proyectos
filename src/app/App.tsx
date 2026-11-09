@@ -68,6 +68,9 @@ const MENU_ITEMS = [
 
 const MENU_SOCIAL_ITEMS = [
   { label: "Instagram", link: "https://www.instagram.com/gdd_col/" },
+  { label: "Discord", link: "https://discord.com/invite/VZWa7wbSDg" },
+  { label: "Itchio", link: "https://gdd-col.itch.io/" },
+
 ]
 
 export default function App() {
