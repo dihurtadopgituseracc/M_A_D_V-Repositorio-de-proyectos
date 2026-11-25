@@ -28,7 +28,7 @@ export default function LandingPage({
     "ideas",
     "ecosistema",
     "industria",
-    "colaboración ",
+    "colaboración ✦",
         
   ]
 
